@@ -1,67 +1,295 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
     <meta charset="utf-8">
-    <title>Mappa Tram Firenze</title>
-    <link rel="stylesheet" href="leaflet/leaflet.css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firenze delle Religioni</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
     <style>
-        #map { height: 100vh; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Titolo */
+        #titolo {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background-color: rgba(255, 255, 255, 0.88);
+            padding: 8px 24px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            letter-spacing: 1px;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Indice */
+        #indice {
+            position: fixed;
+            bottom: 30px;
+            left: 15px;
+            z-index: 1000;
+            background-color: rgba(220, 220, 220, 0.92);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 17px;
+            color: #222;
+            padding: 12px 16px;
+            min-width: 210px;
+        }
+
+        #indice h3 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #aaa;
+            padding-bottom: 6px;
+        }
+
+        .indice-gruppo {
+            margin-bottom: 8px;
+        }
+
+        .indice-gruppo-titolo {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .indice-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 4px 0 4px 12px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .indice-item input[type="checkbox"],
+        .indice-gruppo-titolo input[type="checkbox"] {
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+        }
+
+        .legenda-linea {
+            display: inline-block;
+            width: 28px;
+            height: 4px;
+            border-radius: 2px;
+            vertical-align: middle;
+        }
+
+        .legenda-icona {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+
+        /* Popup */
+        .popup-titolo {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #222;
+        }
+
+        .popup-riga {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 13px;
+            color: #444;
+            margin: 2px 0;
+        }
+
+        .popup-label {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-<div id="map"></div>
+    <!-- Titolo -->
+    <div id="titolo">Firenze delle Religioni</div>
 
-<script src="leaflet/leaflet.js"></script>
-<script>
-// Inizializza mappa
-var map = L.map('map').setView([41.9, 12.5], 13);
+    <!-- Mappa -->
+    <div id="map"></div>
 
-// Basemap offline (vuoto)
-var osmLayer = L.tileLayer('', { attribution: '' }).addTo(map);
+    <!-- Indice -->
+    <div id="indice">
+        <h3>Indice</h3>
 
-// -------------------
-// Layer linee tram
-// -------------------
-var lineeData = {}; // copia qui il contenuto di tracciati_tram.geojson
-var lineeTram = L.geoJSON(lineeData, {
-    style: { color: "red", weight: 3 },
-    onEachFeature: function(feature, layer) {
-        if(feature.properties) layer.bindPopup(JSON.stringify(feature.properties));
-    }
-}).addTo(map);
+        <!-- Gruppo Tram -->
+        <div class="indice-gruppo">
+            <div class="indice-gruppo-titolo">
+                <input type="checkbox" id="chk-tram" checked> 🚋 Tram
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-t1" checked>
+                <span class="legenda-linea" style="background:#e63946;"></span>
+                Tracciato L1
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-t2" checked>
+                <span class="legenda-linea" style="background:#2196F3;"></span>
+                Tracciato L2
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-fermate1" checked>
+                <img src="images/T1.png" class="legenda-icona"> Fermate L1
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-fermate2" checked>
+                <img src="images/T2.png" class="legenda-icona"> Fermate L2
+            </div>
+        </div>
 
-// -------------------
-// Layer fermate
-// -------------------
-var iconaT1 = L.icon({ iconUrl: 'T1.png', iconSize: [25, 25] });
-var iconaT2 = L.icon({ iconUrl: 'T2.png', iconSize: [25, 25] });
+    </div>
 
-var fermateData = {}; // copia qui il contenuto di fermate_tram.geojson
-var fermateTram = L.geoJSON(fermateData, {
-    pointToLayer: function(feature, latlng) {
-        if(feature.properties.linea === "T1") return L.marker(latlng, { icon: iconaT1 });
-        else if(feature.properties.linea === "T2") return L.marker(latlng, { icon: iconaT2 });
-        else return L.marker(latlng); // default
-    },
-    onEachFeature: function(feature, layer) {
-        if(feature.properties) layer.bindPopup(JSON.stringify(feature.properties));
-    }
-}).addTo(map);
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-// -------------------
-// Toggle layer
-// -------------------
-var overlayMaps = { "Linee Tram": lineeTram, "Fermate Tram": fermateTram };
-L.control.layers(null, overlayMaps).addTo(map);
+    <script>
+        // Mappa centrata su Firenze
+        var map = L.map('map', {
+            center: [43.7696, 11.2558],
+            zoom: 13
+        });
 
-// -------------------
-// Centra mappa su dati
-// -------------------
-var group = L.featureGroup([lineeTram, fermateTram]);
-map.fitBounds(group.getBounds());
+        // Basemap CartoDB Positron
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+            maxZoom: 19
+        }).addTo(map);
 
-</script>
+        // Icone fermate
+        var iconaT1 = L.icon({
+            iconUrl: 'images/T1.png',
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+            popupAnchor: [0, -14]
+        });
 
+        var iconaT2 = L.icon({
+            iconUrl: 'images/T2.png',
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+            popupAnchor: [0, -14]
+        });
+
+        // Layer tracciati
+        var layerTracciatiT1 = L.geoJSON(null, {
+            style: { color: '#e63946', weight: 4, opacity: 0.9 }
+        });
+        var layerTracciatiT2 = L.geoJSON(null, {
+            style: { color: '#2196F3', weight: 4, opacity: 0.9 }
+        });
+
+        // Layer fermate
+        var layerFermateT1 = L.geoJSON(null, {
+            pointToLayer: function(feature, latlng) {
+                return L.marker(latlng, { icon: iconaT1 });
+            },
+            onEachFeature: function(feature, layer) {
+                var p = feature.properties;
+                var html = '<div class="popup-titolo">' + (p.nome_ferma || p.nome || 'Fermata') + '</div>';
+                if (p.linea) html += '<div class="popup-riga"><span class="popup-label">Linea:</span> ' + p.linea + '</div>';
+                layer.bindPopup(html);
+            }
+        });
+        var layerFermateT2 = L.geoJSON(null, {
+            pointToLayer: function(feature, latlng) {
+                return L.marker(latlng, { icon: iconaT2 });
+            },
+            onEachFeature: function(feature, layer) {
+                var p = feature.properties;
+                var html = '<div class="popup-titolo">' + (p.nome_ferma || p.nome || 'Fermata') + '</div>';
+                if (p.linea) html += '<div class="popup-riga"><span class="popup-label">Linea:</span> ' + p.linea + '</div>';
+                layer.bindPopup(html);
+            }
+        });
+
+        // Carica Tracciati
+        fetch('Tracciati Tram.geojson')
+            .then(r => r.json())
+            .then(data => {
+                data.features.forEach(function(feature) {
+                    var linea = String(feature.properties.linea || feature.properties.LINEA || '');
+                    if (linea.includes('1')) {
+                        layerTracciatiT1.addData(feature);
+                    } else {
+                        layerTracciatiT2.addData(feature);
+                    }
+                });
+                layerTracciatiT1.addTo(map);
+                layerTracciatiT2.addTo(map);
+            })
+            .catch(function() { console.warn('Tracciati Tram.geojson non trovato'); });
+
+        // Carica Fermate
+        fetch('Fermate Tram.geojson')
+            .then(r => r.json())
+            .then(data => {
+                data.features.forEach(function(feature) {
+                    var linea = String(feature.properties.linea || feature.properties.LINEA || '');
+                    if (linea.includes('1')) {
+                        layerFermateT1.addData(feature);
+                    } else {
+                        layerFermateT2.addData(feature);
+                    }
+                });
+                layerFermateT1.addTo(map);
+                layerFermateT2.addTo(map);
+            })
+            .catch(function() { console.warn('Fermate Tram.geojson non trovato'); });
+
+        // Controlli indice
+        function toggleLayer(layer, visible) {
+            if (visible) { map.addLayer(layer); }
+            else { map.removeLayer(layer); }
+        }
+
+        document.getElementById('chk-t1').addEventListener('change', function() {
+            toggleLayer(layerTracciatiT1, this.checked);
+        });
+        document.getElementById('chk-t2').addEventListener('change', function() {
+            toggleLayer(layerTracciatiT2, this.checked);
+        });
+        document.getElementById('chk-fermate1').addEventListener('change', function() {
+            toggleLayer(layerFermateT1, this.checked);
+        });
+        document.getElementById('chk-fermate2').addEventListener('change', function() {
+            toggleLayer(layerFermateT2, this.checked);
+        });
+
+        // Gruppo Tram — accende/spegne tutto insieme
+        document.getElementById('chk-tram').addEventListener('change', function() {
+            var checked = this.checked;
+            ['chk-t1','chk-t2','chk-fermate1','chk-fermate2'].forEach(function(id) {
+                var chk = document.getElementById(id);
+                chk.checked = checked;
+                chk.dispatchEvent(new Event('change'));
+            });
+        });
+
+    </script>
 </body>
 </html>
