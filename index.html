@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mappa Tram Firenze</title>
+    <link rel="stylesheet" href="leaflet/leaflet.css"/>
+    <style>
+        #map { height: 100vh; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script src="leaflet/leaflet.js"></script>
+<script>
+// Inizializza mappa
+var map = L.map('map').setView([41.9, 12.5], 13);
+
+// Basemap offline (vuoto)
+var osmLayer = L.tileLayer('', { attribution: '' }).addTo(map);
+
+// -------------------
+// Layer linee tram
+// -------------------
+var lineeData = {}; // copia qui il contenuto di tracciati_tram.geojson
+var lineeTram = L.geoJSON(lineeData, {
+    style: { color: "red", weight: 3 },
+    onEachFeature: function(feature, layer) {
+        if(feature.properties) layer.bindPopup(JSON.stringify(feature.properties));
+    }
+}).addTo(map);
+
+// -------------------
+// Layer fermate
+// -------------------
+var iconaT1 = L.icon({ iconUrl: 'T1.png', iconSize: [25, 25] });
+var iconaT2 = L.icon({ iconUrl: 'T2.png', iconSize: [25, 25] });
+
+var fermateData = {}; // copia qui il contenuto di fermate_tram.geojson
+var fermateTram = L.geoJSON(fermateData, {
+    pointToLayer: function(feature, latlng) {
+        if(feature.properties.linea === "T1") return L.marker(latlng, { icon: iconaT1 });
+        else if(feature.properties.linea === "T2") return L.marker(latlng, { icon: iconaT2 });
+        else return L.marker(latlng); // default
+    },
+    onEachFeature: function(feature, layer) {
+        if(feature.properties) layer.bindPopup(JSON.stringify(feature.properties));
+    }
+}).addTo(map);
+
+// -------------------
+// Toggle layer
+// -------------------
+var overlayMaps = { "Linee Tram": lineeTram, "Fermate Tram": fermateTram };
+L.control.layers(null, overlayMaps).addTo(map);
+
+// -------------------
+// Centra mappa su dati
+// -------------------
+var group = L.featureGroup([lineeTram, fermateTram]);
+map.fitBounds(group.getBounds());
+
+</script>
+
+</body>
+</html>
