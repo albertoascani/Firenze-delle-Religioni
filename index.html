@@ -263,12 +263,6 @@
         document.getElementById('chk-t1').addEventListener('change', function() {
             toggleLayer(layerTracciatiBase, this.checked);
             toggleLayer(layerTracciatiRel, this.checked);
-            document.getElementById('chk-t2').checked = this.checked;
-        });
-        document.getElementById('chk-t2').addEventListener('change', function() {
-            toggleLayer(layerTracciatiBase, this.checked);
-            toggleLayer(layerTracciatiRel, this.checked);
-            document.getElementById('chk-t1').checked = this.checked;
         });
         document.getElementById('chk-fermate1').addEventListener('change', function() {
             toggleLayer(layerFermateT1, this.checked);
@@ -280,7 +274,7 @@
         // Gruppo Tram — accende/spegne tutto insieme
         document.getElementById('chk-tram').addEventListener('change', function() {
             var checked = this.checked;
-            ['chk-t1','chk-t2','chk-fermate1','chk-fermate2'].forEach(function(id) {
+            ['chk-t1','chk-fermate1','chk-fermate2'].forEach(function(id) {
                 var chk = document.getElementById(id);
                 chk.checked = checked;
                 chk.dispatchEvent(new Event('change'));
