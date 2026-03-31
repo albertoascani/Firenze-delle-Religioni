@@ -154,11 +154,11 @@
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-fermate1" checked>
-                <img src="images/T1.png" class="legenda-icona"> Fermate L1
+                <img src="immagini/T1.png" class="legenda-icona"> Fermate L1
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-fermate2" checked>
-                <img src="images/T2.png" class="legenda-icona"> Fermate L2
+                <img src="immagini/T2.png" class="legenda-icona"> Fermate L2
             </div>
         </div>
 
@@ -182,14 +182,14 @@
 
         // Icone fermate
         var iconaT1 = L.icon({
-            iconUrl: 'images/T1.png',
+            iconUrl: 'immagini/T1.png',
             iconSize: [28, 28],
             iconAnchor: [14, 14],
             popupAnchor: [0, -14]
         });
 
         var iconaT2 = L.icon({
-            iconUrl: 'images/T2.png',
+            iconUrl: 'immagini/T2.png',
             iconSize: [28, 28],
             iconAnchor: [14, 14],
             popupAnchor: [0, -14]
@@ -228,7 +228,7 @@
         });
 
         // Carica Tracciati
-        fetch('Tracciati Tram.geojson')
+        fetch('TracciatiTram.geojson')
             .then(r => r.json())
             .then(data => {
                 data.features.forEach(function(feature) {
@@ -245,7 +245,7 @@
             .catch(function() { console.warn('Tracciati Tram.geojson non trovato'); });
 
         // Carica Fermate
-        fetch('Fermate Tram.geojson')
+        fetch('FermateTram.geojson')
             .then(r => r.json())
             .then(data => {
                 data.features.forEach(function(feature) {
