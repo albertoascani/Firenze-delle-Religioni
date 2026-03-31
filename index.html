@@ -104,7 +104,54 @@
             object-fit: contain;
         }
 
-        /* Popup */
+        /* Barra di ricerca */
+        #ricerca-container {
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        #ricerca-input {
+            width: 100%;
+            padding: 6px 10px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 15px;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.8);
+            box-sizing: border-box;
+        }
+
+        #ricerca-risultati {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 2000;
+            display: none;
+        }
+
+        .risultato-item {
+            padding: 6px 10px;
+            cursor: pointer;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .risultato-item:hover {
+            background-color: #e0e0e0;
+        }
+
+        .risultato-categoria {
+            font-size: 11px;
+            color: #888;
+            margin-left: 4px;
+        }
         .popup-titolo {
             font-family: 'Times New Roman', Times, serif;
             font-size: 15px;
@@ -136,6 +183,12 @@
     <!-- Indice -->
     <div id="indice">
         <h3>Indice</h3>
+
+        <!-- Barra di ricerca -->
+        <div id="ricerca-container">
+            <input type="text" id="ricerca-input" placeholder="🔍 Cerca fermata o indirizzo...">
+            <div id="ricerca-risultati"></div>
+        </div>
 
         <!-- Gruppo Tram -->
         <div class="indice-gruppo">
@@ -251,6 +304,7 @@
                 });
                 layerFermateT1.addTo(map);
                 layerFermateT2.addTo(map);
+                aggiornaRicerca();
             })
             .catch(function() { console.warn('FermateTram.geojson non trovato'); });
 
@@ -271,7 +325,91 @@
             toggleLayer(layerFermateT2, this.checked);
         });
 
-        // Gruppo Tram — accende/spegne tutto insieme
+        // ===== RICERCA =====
+        var tuttiIPunti = []; // raccoglie tutte le fermate
+
+        function aggiungiAllaRicerca(layer, categoria) {
+            layer.eachLayer(function(l) {
+                if (l.feature && l.feature.properties) {
+                    var p = l.feature.properties;
+                    var nome = p.nome_ferma || p.nome || '';
+                    if (nome) {
+                        tuttiIPunti.push({
+                            nome: nome,
+                            categoria: categoria,
+                            layer: l
+                        });
+                    }
+                }
+            });
+        }
+
+        // Aggiorna lista ricerca dopo caricamento layer
+        function aggiornaRicerca() {
+            tuttiIPunti = [];
+            aggiungiAllaRicerca(layerFermateT1, 'Fermata L1');
+            aggiungiAllaRicerca(layerFermateT2, 'Fermata L2');
+        }
+
+        var ricercaTimeout;
+        document.getElementById('ricerca-input').addEventListener('input', function() {
+            clearTimeout(ricercaTimeout);
+            var query = this.value.trim();
+            var risultati = document.getElementById('ricerca-risultati');
+
+            if (query.length < 2) {
+                risultati.style.display = 'none';
+                return;
+            }
+
+            risultati.innerHTML = '';
+            risultati.style.display = 'block';
+
+            // Cerca nelle fermate locali
+            var trovati = tuttiIPunti.filter(function(p) {
+                return p.nome.toLowerCase().includes(query.toLowerCase());
+            });
+
+            trovati.forEach(function(p) {
+                var div = document.createElement('div');
+                div.className = 'risultato-item';
+                div.innerHTML = p.nome + ' <span class="risultato-categoria">(' + p.categoria + ')</span>';
+                div.addEventListener('click', function() {
+                    var latlng = p.layer.getLatLng();
+                    map.setView(latlng, 16);
+                    p.layer.openPopup();
+                    risultati.style.display = 'none';
+                    document.getElementById('ricerca-input').value = p.nome;
+                });
+                risultati.appendChild(div);
+            });
+
+            // Cerca indirizzi con Nominatim
+            ricercaTimeout = setTimeout(function() {
+                fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query + ' Firenze') + '&format=json&limit=3')
+                    .then(r => r.json())
+                    .then(data => {
+                        data.forEach(function(item) {
+                            var div = document.createElement('div');
+                            div.className = 'risultato-item';
+                            div.innerHTML = item.display_name.split(',').slice(0,2).join(',') + ' <span class="risultato-categoria">(indirizzo)</span>';
+                            div.addEventListener('click', function() {
+                                map.setView([parseFloat(item.lat), parseFloat(item.lon)], 16);
+                                risultati.style.display = 'none';
+                                document.getElementById('ricerca-input').value = item.display_name.split(',')[0];
+                            });
+                            risultati.appendChild(div);
+                        });
+                    });
+            }, 400);
+        });
+
+        // Chiudi risultati cliccando fuori
+        document.addEventListener('click', function(e) {
+            if (!document.getElementById('ricerca-container').contains(e.target)) {
+                document.getElementById('ricerca-risultati').style.display = 'none';
+            }
+        });
         document.getElementById('chk-tram').addEventListener('change', function() {
             var checked = this.checked;
             ['chk-t1','chk-fermate1','chk-fermate2'].forEach(function(id) {
