@@ -197,8 +197,13 @@
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-t1" checked>
-                <span style="display:inline-block; width:28px; height:8px; background:#888; border-top:2px dashed #333; vertical-align:middle;"></span>
-                Tracciato Tram
+                <span class="legenda-linea" style="background:#2196F3;"></span>
+                Tracciato L1
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-t2" checked>
+                <span class="legenda-linea" style="background:#e63946;"></span>
+                Tracciato L2
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-fermate1" checked>
@@ -214,6 +219,8 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Plugin offset linee parallele -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-polylineoffset@1.1.0/leaflet.polylineoffset.js"></script>
 
     <script>
         // Mappa centrata su Firenze
@@ -243,12 +250,12 @@
             popupAnchor: [0, -14]
         });
 
-        // Layer tracciato stile binario — base grigia + traversine
-        var layerTracciatiBase = L.geoJSON(null, {
-            style: { color: '#888888', weight: 8, opacity: 0.7, lineCap: 'square' }
+        // Layer tracciati L1 blu, L2 rosso con offset dove si sovrappongono
+        var layerTracciatiT1 = L.geoJSON(null, {
+            style: { color: '#2196F3', weight: 5, opacity: 0.9, offset: 3 }
         });
-        var layerTracciatiRel = L.geoJSON(null, {
-            style: { color: '#333333', weight: 2, opacity: 0.9, dashArray: '2, 10', lineCap: 'square' }
+        var layerTracciatiT2 = L.geoJSON(null, {
+            style: { color: '#e63946', weight: 5, opacity: 0.9, offset: -3 }
         });
 
         // Layer fermate
@@ -281,12 +288,15 @@
             .then(data => {
                 data.features.forEach(function(feature) {
                     var linea = feature.properties.linea;
-                    if (linea === null) return; // ignora tratte fuori linea
-                    layerTracciatiBase.addData(feature);
-                    layerTracciatiRel.addData(feature);
+                    if (linea === null) return;
+                    if (linea == 1) {
+                        layerTracciatiT1.addData(feature);
+                    } else if (linea == 2) {
+                        layerTracciatiT2.addData(feature);
+                    }
                 });
-                layerTracciatiBase.addTo(map);
-                layerTracciatiRel.addTo(map);
+                layerTracciatiT1.addTo(map);
+                layerTracciatiT2.addTo(map);
             })
             .catch(function() { console.warn('TracciatiTram.geojson non trovato'); });
 
@@ -315,8 +325,10 @@
         }
 
         document.getElementById('chk-t1').addEventListener('change', function() {
-            toggleLayer(layerTracciatiBase, this.checked);
-            toggleLayer(layerTracciatiRel, this.checked);
+            toggleLayer(layerTracciatiT1, this.checked);
+        });
+        document.getElementById('chk-t2').addEventListener('change', function() {
+            toggleLayer(layerTracciatiT2, this.checked);
         });
         document.getElementById('chk-fermate1').addEventListener('change', function() {
             toggleLayer(layerFermateT1, this.checked);
