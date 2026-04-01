@@ -197,13 +197,8 @@
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-t1" checked>
-                <span class="legenda-linea" style="background:#2196F3;"></span>
-                Tracciato L1
-            </div>
-            <div class="indice-item">
-                <input type="checkbox" id="chk-t2" checked>
-                <span class="legenda-linea" style="background:#e63946;"></span>
-                Tracciato L2
+                <span style="display:inline-block; width:30px; height:10px; border-top:3px solid #555; border-bottom:3px solid #555; background: repeating-linear-gradient(90deg, transparent 0px, transparent 4px, #555 4px, #555 5px); flex-shrink:0;"></span>
+                Tracciato Tram
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-fermate1" checked>
@@ -250,25 +245,26 @@
             popupAnchor: [0, -14]
         });
 
-        // ── Layer tracciati con offset (linee parallele, vertici lisci) ──
-        var layerTracciatiT1 = L.geoJSON(null, {
+        // ── Layer tracciato unico stile binario ──
+        // Linea base grigia
+        var layerTracciatiBase = L.geoJSON(null, {
             style: {
-                color: '#2196F3',
-                weight: 4,
-                opacity: 0.9,
-                offset: -4,
+                color: '#555555',
+                weight: 3,
+                opacity: 1,
                 lineCap: 'round',
                 lineJoin: 'round'
             }
         });
 
-        var layerTracciatiT2 = L.geoJSON(null, {
+        // Tacche perpendicolari simulate con dashArray corto e peso maggiore
+        var layerTracciatiTacche = L.geoJSON(null, {
             style: {
-                color: '#e63946',
-                weight: 4,
-                opacity: 0.9,
-                offset: 4,
-                lineCap: 'round',
+                color: '#555555',
+                weight: 8,
+                opacity: 0.7,
+                dashArray: '1 12',
+                lineCap: 'square',
                 lineJoin: 'round'
             }
         });
@@ -296,13 +292,12 @@
             .then(r => r.json())
             .then(data => {
                 data.features.forEach(function(f) {
-                    var linea = f.properties.linea;
-                    if (linea === null) return;
-                    if (linea == 1) layerTracciatiT1.addData(f);
-                    else if (linea == 2) layerTracciatiT2.addData(f);
+                    if (f.properties.linea === null) return;
+                    layerTracciatiBase.addData(f);
+                    layerTracciatiTacche.addData(f);
                 });
-                layerTracciatiT1.addTo(map);
-                layerTracciatiT2.addTo(map);
+                layerTracciatiBase.addTo(map);
+                layerTracciatiTacche.addTo(map);
             })
             .catch(function() { console.warn('TracciatiTram.geojson non trovato'); });
 
@@ -328,10 +323,8 @@
         }
 
         document.getElementById('chk-t1').addEventListener('change', function() {
-            toggleLayer(layerTracciatiT1, this.checked);
-        });
-        document.getElementById('chk-t2').addEventListener('change', function() {
-            toggleLayer(layerTracciatiT2, this.checked);
+            toggleLayer(layerTracciatiBase, this.checked);
+            toggleLayer(layerTracciatiTacche, this.checked);
         });
         document.getElementById('chk-fermate1').addEventListener('change', function() {
             toggleLayer(layerFermateT1, this.checked);
@@ -340,10 +333,9 @@
             toggleLayer(layerFermateT2, this.checked);
         });
 
-        // Gruppo Tram
         document.getElementById('chk-tram').addEventListener('change', function() {
             var checked = this.checked;
-            ['chk-t1','chk-t2','chk-fermate1','chk-fermate2'].forEach(function(id) {
+            ['chk-t1','chk-fermate1','chk-fermate2'].forEach(function(id) {
                 var chk = document.getElementById(id);
                 chk.checked = checked;
                 chk.dispatchEvent(new Event('change'));
