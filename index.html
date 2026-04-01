@@ -16,14 +16,14 @@
             height: 100%;
         }
 
-        /* Titolo */
+        /* ── Titolo ── */
         #titolo {
             position: absolute;
             top: 15px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
-            background-color: rgba(255, 255, 255, 0.88);
+            background: rgba(255,255,255,0.88);
             padding: 8px 24px;
             border-radius: 6px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -36,88 +36,44 @@
             white-space: nowrap;
         }
 
-        /* Indice */
+        /* ── Indice ── */
         #indice {
             position: fixed;
             bottom: 30px;
             left: 15px;
             z-index: 1000;
-            background-color: rgba(220, 220, 220, 0.92);
+            background: rgba(220,220,220,0.92);
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             font-family: 'Times New Roman', Times, serif;
             font-size: 17px;
             color: #222;
             padding: 12px 16px;
-            min-width: 210px;
+            min-width: 220px;
         }
 
         #indice h3 {
             font-size: 18px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             border-bottom: 1px solid #aaa;
             padding-bottom: 6px;
         }
 
-        .indice-gruppo {
-            margin-bottom: 8px;
-        }
-
-        .indice-gruppo-titolo {
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .indice-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 4px 0 4px 12px;
-            cursor: pointer;
-            font-size: 15px;
-        }
-
-        .indice-item input[type="checkbox"],
-        .indice-gruppo-titolo input[type="checkbox"] {
-            width: 15px;
-            height: 15px;
-            cursor: pointer;
-        }
-
-        .legenda-linea {
-            display: inline-block;
-            width: 28px;
-            height: 4px;
-            border-radius: 2px;
-            vertical-align: middle;
-        }
-
-        .legenda-icona {
-            width: 20px;
-            height: 20px;
-            object-fit: contain;
-        }
-
-        /* Barra di ricerca */
+        /* ── Ricerca ── */
         #ricerca-container {
-            margin-bottom: 10px;
             position: relative;
+            margin-bottom: 10px;
         }
 
         #ricerca-input {
             width: 100%;
             padding: 6px 10px;
             font-family: 'Times New Roman', Times, serif;
-            font-size: 15px;
+            font-size: 14px;
             border: 1px solid #aaa;
             border-radius: 4px;
-            background: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.85);
             box-sizing: border-box;
         }
 
@@ -133,6 +89,7 @@
             overflow-y: auto;
             z-index: 2000;
             display: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
 
         .risultato-item {
@@ -143,15 +100,60 @@
             border-bottom: 1px solid #eee;
         }
 
-        .risultato-item:hover {
-            background-color: #e0e0e0;
-        }
+        .risultato-item:hover { background: #e8e8e8; }
 
         .risultato-categoria {
             font-size: 11px;
             color: #888;
             margin-left: 4px;
         }
+
+        /* ── Voci indice ── */
+        .indice-gruppo { margin-bottom: 6px; }
+
+        .indice-gruppo-titolo {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .indice-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 4px 0 4px 12px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .indice-item input[type="checkbox"],
+        .indice-gruppo-titolo input[type="checkbox"] {
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .legenda-linea {
+            display: inline-block;
+            width: 28px;
+            height: 4px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .legenda-icona {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        /* ── Popup ── */
         .popup-titolo {
             font-family: 'Times New Roman', Times, serif;
             font-size: 15px;
@@ -167,9 +169,7 @@
             margin: 2px 0;
         }
 
-        .popup-label {
-            font-weight: bold;
-        }
+        .popup-label { font-weight: bold; }
     </style>
 </head>
 <body>
@@ -184,7 +184,7 @@
     <div id="indice">
         <h3>Indice</h3>
 
-        <!-- Barra di ricerca -->
+        <!-- Ricerca -->
         <div id="ricerca-container">
             <input type="text" id="ricerca-input" placeholder="🔍 Cerca fermata o indirizzo...">
             <div id="ricerca-risultati"></div>
@@ -220,22 +220,22 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Plugin offset linee parallele -->
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-polylineoffset@1.1.0/leaflet.polylineoffset.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-polylineoffset@1.1.1/leaflet.polylineoffset.js"></script>
 
     <script>
-        // Mappa centrata su Firenze
+
+        // ── Mappa ──
         var map = L.map('map', {
             center: [43.7696, 11.2558],
             zoom: 13
         });
 
-        // Basemap CartoDB Positron
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
             maxZoom: 19
         }).addTo(map);
 
-        // Icone fermate
+        // ── Icone fermate ──
         var iconaT1 = L.icon({
             iconUrl: 'Immagini/T1.png',
             iconSize: [28, 28],
@@ -250,67 +250,70 @@
             popupAnchor: [0, -14]
         });
 
-        // Layer tracciati L1 blu, L2 rosso con offset dove si sovrappongono
+        // ── Layer tracciati con offset (linee parallele, vertici lisci) ──
         var layerTracciatiT1 = L.geoJSON(null, {
-            style: { color: '#2196F3', weight: 5, opacity: 0.9, offset: 3 }
+            style: {
+                color: '#2196F3',
+                weight: 4,
+                opacity: 0.9,
+                offset: -4,
+                lineCap: 'round',
+                lineJoin: 'round'
+            }
         });
+
         var layerTracciatiT2 = L.geoJSON(null, {
-            style: { color: '#e63946', weight: 5, opacity: 0.9, offset: -3 }
+            style: {
+                color: '#e63946',
+                weight: 4,
+                opacity: 0.9,
+                offset: 4,
+                lineCap: 'round',
+                lineJoin: 'round'
+            }
         });
 
-        // Layer fermate
+        // ── Layer fermate ──
+        function creaPopup(p, linea) {
+            var nome = p.nome_ferma || p.nome || 'Fermata';
+            var html = '<div class="popup-titolo">' + nome + '</div>';
+            html += '<div class="popup-riga"><span class="popup-label">Linea:</span> ' + linea + '</div>';
+            return html;
+        }
+
         var layerFermateT1 = L.geoJSON(null, {
-            pointToLayer: function(feature, latlng) {
-                return L.marker(latlng, { icon: iconaT1 });
-            },
-            onEachFeature: function(feature, layer) {
-                var p = feature.properties;
-                var html = '<div class="popup-titolo">' + (p.nome_ferma || p.nome || 'Fermata') + '</div>';
-                if (p.linea) html += '<div class="popup-riga"><span class="popup-label">Linea:</span> ' + p.linea + '</div>';
-                layer.bindPopup(html);
-            }
-        });
-        var layerFermateT2 = L.geoJSON(null, {
-            pointToLayer: function(feature, latlng) {
-                return L.marker(latlng, { icon: iconaT2 });
-            },
-            onEachFeature: function(feature, layer) {
-                var p = feature.properties;
-                var html = '<div class="popup-titolo">' + (p.nome_ferma || p.nome || 'Fermata') + '</div>';
-                if (p.linea) html += '<div class="popup-riga"><span class="popup-label">Linea:</span> ' + p.linea + '</div>';
-                layer.bindPopup(html);
-            }
+            pointToLayer: function(f, ll) { return L.marker(ll, { icon: iconaT1 }); },
+            onEachFeature: function(f, l) { l.bindPopup(creaPopup(f.properties, '1')); }
         });
 
-        // Carica Tracciati
+        var layerFermateT2 = L.geoJSON(null, {
+            pointToLayer: function(f, ll) { return L.marker(ll, { icon: iconaT2 }); },
+            onEachFeature: function(f, l) { l.bindPopup(creaPopup(f.properties, '2')); }
+        });
+
+        // ── Carica Tracciati ──
         fetch('TracciatiTram.geojson')
             .then(r => r.json())
             .then(data => {
-                data.features.forEach(function(feature) {
-                    var linea = feature.properties.linea;
+                data.features.forEach(function(f) {
+                    var linea = f.properties.linea;
                     if (linea === null) return;
-                    if (linea == 1) {
-                        layerTracciatiT1.addData(feature);
-                    } else if (linea == 2) {
-                        layerTracciatiT2.addData(feature);
-                    }
+                    if (linea == 1) layerTracciatiT1.addData(f);
+                    else if (linea == 2) layerTracciatiT2.addData(f);
                 });
                 layerTracciatiT1.addTo(map);
                 layerTracciatiT2.addTo(map);
             })
             .catch(function() { console.warn('TracciatiTram.geojson non trovato'); });
 
-        // Carica Fermate
+        // ── Carica Fermate ──
         fetch('FermateTram.geojson')
             .then(r => r.json())
             .then(data => {
-                data.features.forEach(function(feature) {
-                    var linea = feature.properties.linea;
-                    if (linea == 1) {
-                        layerFermateT1.addData(feature);
-                    } else if (linea == 2) {
-                        layerFermateT2.addData(feature);
-                    }
+                data.features.forEach(function(f) {
+                    var linea = f.properties.linea;
+                    if (linea == 1) layerFermateT1.addData(f);
+                    else if (linea == 2) layerFermateT2.addData(f);
                 });
                 layerFermateT1.addTo(map);
                 layerFermateT2.addTo(map);
@@ -318,10 +321,10 @@
             })
             .catch(function() { console.warn('FermateTram.geojson non trovato'); });
 
-        // Controlli indice
+        // ── Controlli indice ──
         function toggleLayer(layer, visible) {
-            if (visible) { map.addLayer(layer); }
-            else { map.removeLayer(layer); }
+            if (visible) map.addLayer(layer);
+            else map.removeLayer(layer);
         }
 
         document.getElementById('chk-t1').addEventListener('change', function() {
@@ -337,30 +340,28 @@
             toggleLayer(layerFermateT2, this.checked);
         });
 
-        // ===== RICERCA =====
-        var tuttiIPunti = []; // raccoglie tutte le fermate
-
-        function aggiungiAllaRicerca(layer, categoria) {
-            layer.eachLayer(function(l) {
-                if (l.feature && l.feature.properties) {
-                    var p = l.feature.properties;
-                    var nome = p.nome_ferma || p.nome || '';
-                    if (nome) {
-                        tuttiIPunti.push({
-                            nome: nome,
-                            categoria: categoria,
-                            layer: l
-                        });
-                    }
-                }
+        // Gruppo Tram
+        document.getElementById('chk-tram').addEventListener('change', function() {
+            var checked = this.checked;
+            ['chk-t1','chk-t2','chk-fermate1','chk-fermate2'].forEach(function(id) {
+                var chk = document.getElementById(id);
+                chk.checked = checked;
+                chk.dispatchEvent(new Event('change'));
             });
-        }
+        });
 
-        // Aggiorna lista ricerca dopo caricamento layer
+        // ── Ricerca ──
+        var tuttiIPunti = [];
+
         function aggiornaRicerca() {
             tuttiIPunti = [];
-            aggiungiAllaRicerca(layerFermateT1, 'Fermata L1');
-            aggiungiAllaRicerca(layerFermateT2, 'Fermata L2');
+            [layerFermateT1, layerFermateT2].forEach(function(layer, i) {
+                layer.eachLayer(function(l) {
+                    var p = l.feature && l.feature.properties;
+                    var nome = p && (p.nome_ferma || p.nome || '');
+                    if (nome) tuttiIPunti.push({ nome: nome, categoria: 'Fermata L' + (i+1), layer: l });
+                });
+            });
         }
 
         var ricercaTimeout;
@@ -369,34 +370,28 @@
             var query = this.value.trim();
             var risultati = document.getElementById('ricerca-risultati');
 
-            if (query.length < 2) {
-                risultati.style.display = 'none';
-                return;
-            }
+            if (query.length < 2) { risultati.style.display = 'none'; return; }
 
             risultati.innerHTML = '';
             risultati.style.display = 'block';
 
-            // Cerca nelle fermate locali
-            var trovati = tuttiIPunti.filter(function(p) {
-                return p.nome.toLowerCase().includes(query.toLowerCase());
-            });
-
-            trovati.forEach(function(p) {
-                var div = document.createElement('div');
-                div.className = 'risultato-item';
-                div.innerHTML = p.nome + ' <span class="risultato-categoria">(' + p.categoria + ')</span>';
-                div.addEventListener('click', function() {
-                    var latlng = p.layer.getLatLng();
-                    map.setView(latlng, 16);
-                    p.layer.openPopup();
-                    risultati.style.display = 'none';
-                    document.getElementById('ricerca-input').value = p.nome;
+            // Fermate locali
+            tuttiIPunti
+                .filter(p => p.nome.toLowerCase().includes(query.toLowerCase()))
+                .forEach(function(p) {
+                    var div = document.createElement('div');
+                    div.className = 'risultato-item';
+                    div.innerHTML = p.nome + ' <span class="risultato-categoria">(' + p.categoria + ')</span>';
+                    div.addEventListener('click', function() {
+                        map.setView(p.layer.getLatLng(), 16);
+                        p.layer.openPopup();
+                        risultati.style.display = 'none';
+                        document.getElementById('ricerca-input').value = p.nome;
+                    });
+                    risultati.appendChild(div);
                 });
-                risultati.appendChild(div);
-            });
 
-            // Cerca indirizzi con Nominatim
+            // Indirizzi Nominatim
             ricercaTimeout = setTimeout(function() {
                 fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query + ' Firenze') + '&format=json&limit=3')
                     .then(r => r.json())
@@ -404,7 +399,7 @@
                         data.forEach(function(item) {
                             var div = document.createElement('div');
                             div.className = 'risultato-item';
-                            div.innerHTML = item.display_name.split(',').slice(0,2).join(',') + ' <span class="risultato-categoria">(indirizzo)</span>';
+                            div.innerHTML = item.display_name.split(',').slice(0,2).join(', ') + ' <span class="risultato-categoria">(indirizzo)</span>';
                             div.addEventListener('click', function() {
                                 map.setView([parseFloat(item.lat), parseFloat(item.lon)], 16);
                                 risultati.style.display = 'none';
@@ -421,14 +416,6 @@
             if (!document.getElementById('ricerca-container').contains(e.target)) {
                 document.getElementById('ricerca-risultati').style.display = 'none';
             }
-        });
-        document.getElementById('chk-tram').addEventListener('change', function() {
-            var checked = this.checked;
-            ['chk-t1','chk-fermate1','chk-fermate2'].forEach(function(id) {
-                var chk = document.getElementById(id);
-                chk.checked = checked;
-                chk.dispatchEvent(new Event('change'));
-            });
         });
 
     </script>
