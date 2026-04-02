@@ -18,22 +18,52 @@
 
         /* ── Titolo ── */
         #titolo {
-            position: absolute;
-            top: 15px;
+            position: fixed;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            background: rgba(255,255,255,0.88);
-            padding: 8px 24px;
-            border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
-            letter-spacing: 1px;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            background: transparent;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 48px;
+            font-weight: 200;
+            color: #222;
+            letter-spacing: 6px;
+            text-transform: uppercase;
             pointer-events: none;
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
+            text-shadow: 0 2px 20px rgba(255,255,255,0.8);
+        }
+
+        #titolo.small {
+            top: 18px;
+            left: 50%;
+            transform: translate(-50%, 0);
+            font-size: 18px;
+            font-weight: 400;
+            letter-spacing: 3px;
+            background: rgba(255,255,255,0.88);
+            padding: 7px 22px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            color: #333;
+            text-shadow: none;
+        }
+
+        /* Overlay scuro iniziale */
+        #overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(255,255,255,0.6);
+            z-index: 1999;
+            pointer-events: none;
+            transition: opacity 1.2s ease;
+        }
+
+        #overlay.hidden {
+            opacity: 0;
         }
 
         /* ── Indice ── */
@@ -174,6 +204,9 @@
 </head>
 <body>
 
+    <!-- Overlay iniziale -->
+    <div id="overlay"></div>
+
     <!-- Titolo -->
     <div id="titolo">Firenze delle Religioni</div>
 
@@ -219,7 +252,17 @@
 
     <script>
 
-        // ── Mappa ──
+        // ── Animazione titolo ──
+        setTimeout(function() {
+            document.getElementById('titolo').classList.add('small');
+            document.getElementById('overlay').classList.add('hidden');
+        }, 1000);
+
+        // Rimuovi overlay dopo transizione
+        setTimeout(function() {
+            var overlay = document.getElementById('overlay');
+            overlay.style.display = 'none';
+        }, 2500);
         var map = L.map('map', {
             center: [43.7696, 11.2558],
             zoom: 13
@@ -246,24 +289,24 @@
         });
 
         // ── Layer tracciato unico stile binario ──
-        // Linea base grigia
+        // Linea base grigia neutra
         var layerTracciatiBase = L.geoJSON(null, {
             style: {
-                color: '#555555',
-                weight: 3,
-                opacity: 1,
+                color: '#999999',
+                weight: 2,
+                opacity: 0.9,
                 lineCap: 'round',
                 lineJoin: 'round'
             }
         });
 
-        // Tacche perpendicolari simulate con dashArray corto e peso maggiore
+        // Tacche trasversali piccole
         var layerTracciatiTacche = L.geoJSON(null, {
             style: {
-                color: '#555555',
-                weight: 8,
-                opacity: 0.7,
-                dashArray: '1 12',
+                color: '#888888',
+                weight: 5,
+                opacity: 0.6,
+                dashArray: '1 10',
                 lineCap: 'square',
                 lineJoin: 'round'
             }
