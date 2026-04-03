@@ -266,15 +266,15 @@
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-cattolici" checked>
-                <img src="Immagini/CroceCattolica.png" class="legenda-icona"> Cristiani Cattolici
+                <span>✝️</span> Cristiani Cattolici
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-ortodossi" checked>
-                <img src="Immagini/CroceOrtodossa.png" class="legenda-icona"> Cristiani Ortodossi
+                <span>☦️</span> Cristiani Ortodossi
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-protestanti" checked>
-                <img src="Immagini/CrocePresbiteriana.png" class="legenda-icona"> Evangelici Protestanti
+                <span>🛐</span> Evangelici Protestanti
             </div>
         </div>
 
@@ -376,9 +376,9 @@
         });
 
         // ── Icone Luoghi di Culto ──
-        var iconaCattolici = L.icon({ iconUrl: 'Immagini/CroceCattolica.png', iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14] });
-        var iconaOrtodossi = L.icon({ iconUrl: 'Immagini/CroceOrtodossa.png', iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14] });
-        var iconaProtestanti = L.icon({ iconUrl: 'Immagini/CrocePresbiteriana.png', iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14] });
+        var iconaCattolici = L.divIcon({ html: '<div style="font-size:24px; line-height:28px; text-align:center;">✝️</div>', iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14], className: '' });
+        var iconaOrtodossi = L.divIcon({ html: '<div style="font-size:24px; line-height:28px; text-align:center;">☦️</div>', iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14], className: '' });
+        var iconaProtestanti = L.divIcon({ html: '<div style="font-size:24px; line-height:28px; text-align:center;">🛐</div>', iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14], className: '' });
 
         function creaPopupCulto(p) {
             var html = '<div class="popup-titolo">' + (p.Nome || p.nome || '') + '</div>';
