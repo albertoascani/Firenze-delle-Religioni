@@ -25,30 +25,33 @@
             z-index: 2000;
             background: transparent;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 48px;
+            font-size: clamp(20px, 5vw, 48px);
             font-weight: 200;
             color: #222;
-            letter-spacing: 6px;
+            letter-spacing: clamp(2px, 1vw, 6px);
             text-transform: uppercase;
             pointer-events: none;
             transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
             text-shadow: 0 2px 20px rgba(255,255,255,0.8);
+            width: 90vw;
+            text-align: center;
         }
 
         #titolo.small {
             top: 18px;
             left: 50%;
             transform: translate(-50%, 0);
-            font-size: 18px;
+            font-size: clamp(12px, 2.5vw, 18px);
             font-weight: 400;
-            letter-spacing: 3px;
+            letter-spacing: clamp(1px, 0.5vw, 3px);
             background: rgba(255,255,255,0.88);
             padding: 7px 22px;
             border-radius: 6px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             color: #333;
             text-shadow: none;
+            width: auto;
         }
 
         #sottotitolo {
@@ -242,7 +245,7 @@
         <!-- Gruppo Tram -->
         <div class="indice-gruppo">
             <div class="indice-gruppo-titolo">
-                <input type="checkbox" id="chk-tram" checked> 🚋 Tram
+                <input type="checkbox" id="chk-tram" checked> Tram
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-t1" checked>
@@ -262,7 +265,7 @@
         <!-- Gruppo Luoghi di Culto -->
         <div class="indice-gruppo">
             <div class="indice-gruppo-titolo">
-                <input type="checkbox" id="chk-culto" checked> ✝️ Luoghi di Culto
+                <input type="checkbox" id="chk-culto" checked> Luoghi di Culto
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-cattolici" checked>
