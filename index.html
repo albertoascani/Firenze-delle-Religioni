@@ -254,11 +254,13 @@
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-fermate1" checked>
-                <img src="Immagini/T1.png" class="legenda-icona"> Fermate L1
+                <span style="background:#2196F3; color:white; border-radius:50%; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; flex-shrink:0;">1</span>
+                Fermate L1
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-fermate2" checked>
-                <img src="Immagini/T2.png" class="legenda-icona"> Fermate L2
+                <span style="background:#e63946; color:white; border-radius:50%; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; flex-shrink:0;">2</span>
+                Fermate L2
             </div>
         </div>
 
@@ -322,18 +324,14 @@
         }).addTo(map);
 
         // ── Icone fermate ──
-        var iconaT1 = L.icon({
-            iconUrl: 'Immagini/T1.png',
-            iconSize: [28, 28],
-            iconAnchor: [14, 14],
-            popupAnchor: [0, -14]
+        var iconaT1 = L.divIcon({
+            html: '<div style="background:#2196F3; color:white; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:bold; font-family:Helvetica,sans-serif; box-shadow:0 1px 4px rgba(0,0,0,0.3);">1</div>',
+            iconSize: [26,26], iconAnchor: [13,13], popupAnchor: [0,-13], className: ''
         });
 
-        var iconaT2 = L.icon({
-            iconUrl: 'Immagini/T2.png',
-            iconSize: [28, 28],
-            iconAnchor: [14, 14],
-            popupAnchor: [0, -14]
+        var iconaT2 = L.divIcon({
+            html: '<div style="background:#e63946; color:white; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:bold; font-family:Helvetica,sans-serif; box-shadow:0 1px 4px rgba(0,0,0,0.3);">2</div>',
+            iconSize: [26,26], iconAnchor: [13,13], popupAnchor: [0,-13], className: ''
         });
 
         // ── Layer tracciato unico stile binario ──
