@@ -1,0 +1,12 @@
+{
+"type": "FeatureCollection",
+"name": "EvangeliciProtestanti",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Categoria": "Evangelica / protestante", "Sottocategoria": "Valdese", "Nome": "Chiesa Valdese di Firenze", "Indirizzo": "Via Micheli 26, 50121, Firenze", "Latitude": 43.780225, "Longitude": 11.2610245 }, "geometry": { "type": "Point", "coordinates": [ 11.2610245, 43.780225 ] } },
+{ "type": "Feature", "properties": { "Categoria": "Evangelica / protestante", "Sottocategoria": "Luterana", "Nome": "Comunità Evangelica Luterana di Firenze", "Indirizzo": "Lungarno Torrigiani, 11, 50125, Firenze", "Latitude": 43.7656026, "Longitude": 11.257232 }, "geometry": { "type": "Point", "coordinates": [ 11.257232, 43.7656026 ] } },
+{ "type": "Feature", "properties": { "Categoria": "Evangelica / protestante", "Sottocategoria": "Anglicana", "Nome": "St Mark’s English Church", "Indirizzo": "Via Maggio 16/18, 50125, Firenze", "Latitude": 43.7674596, "Longitude": 11.2492974 }, "geometry": { "type": "Point", "coordinates": [ 11.2492974, 43.7674596 ] } },
+{ "type": "Feature", "properties": { "Categoria": "Evangelica / protestante", "Sottocategoria": "Battista", "Nome": "Chiesa Battista della Riconciliazione", "Indirizzo": "Via Borgo Ognissanti 4, 50123, Firenze", "Latitude": 43.461693, "Longitude": 11.145065 }, "geometry": { "type": "Point", "coordinates": [ 11.145065, 43.461693 ] } },
+{ "type": "Feature", "properties": { "Categoria": "Evangelica / protestante", "Sottocategoria": "Evangelica", "Nome": "The Life Church Italia – Firenze", "Indirizzo": "Via di Novoli 2, 50127, Firenze", "Latitude": 43.6308358, "Longitude": 11.2542973 }, "geometry": { "type": "Point", "coordinates": [ 11.2542973, 43.6308358 ] } }
+]
+}

@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "CristianiOrtodossi",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Categoria": "Cristiana ortodossa", "Sottocategoria": "Ortodossa greca", "Nome": "Chiesa Ortodossa Greca di San Jacopo Apostolo", "Indirizzo": "Borgo San Jacopo 34, 50125, Firenze", "Latitude": 43.768116002645364, "Longitude": 11.250592604701838 }, "geometry": { "type": "Point", "coordinates": [ 11.250592604701838, 43.768116002645364 ] } },
+{ "type": "Feature", "properties": { "Categoria": "Cristiana ortodossa", "Sottocategoria": "Ortodossa russa", "Nome": "Chiesa Ortodossa Russa – Natività di Cristo e San Nicola Taumaturgo", "Indirizzo": "Via Leone X 8, 50129, Firenze", "Latitude": 43.783835449398403, "Longitude": 11.254740313677974 }, "geometry": { "type": "Point", "coordinates": [ 11.254740313677974, 43.783835449398403 ] } },
+{ "type": "Feature", "properties": { "Categoria": "Cristiana ortodossa", "Sottocategoria": "Ortodossa romena", "Nome": "Parrocchia Ortodossa Romena “Ascensione del Signore”", "Indirizzo": "Viale Giovanni Amendola 42, 50121 Firenze", "Latitude": 43.769863584366384, "Longitude": 11.271267210981376 }, "geometry": { "type": "Point", "coordinates": [ 11.271267210981376, 43.769863584366384 ] } },
+{ "type": "Feature", "properties": { "Categoria": "Cristiana ortodossa", "Sottocategoria": "Copta ortodossa etiope", "Nome": "Chiesa Copta Ortodossa Etiope “San Mina”", "Indirizzo": "Via San Bartolo in Tuto 7, 50018, Scandicci", "Latitude": 43.753892363584598, "Longitude": 11.184036082145274 }, "geometry": { "type": "Point", "coordinates": [ 11.184036082145274, 43.753892363584598 ] } }
+]
+}
