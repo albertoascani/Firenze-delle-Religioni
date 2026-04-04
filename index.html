@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firenze delle Religioni</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ── Titolo ── */
+        #titolo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            background: transparent;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: clamp(20px, 5vw, 48px);
+            font-weight: 200;
+            color: #222;
+            letter-spacing: clamp(2px, 1vw, 6px);
+            text-transform: uppercase;
+            pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            text-shadow: 0 2px 20px rgba(255,255,255,0.8);
+            width: 90vw;
+            text-align: center;
+        }
+
+        #titolo.small {
+            top: 18px;
+            left: 50%;
+            transform: translate(-50%, 0);
+            font-size: clamp(12px, 2.5vw, 18px);
+            font-weight: 400;
+            letter-spacing: clamp(1px, 0.5vw, 3px);
+            background: rgba(255,255,255,0.88);
+            padding: 7px 22px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            color: #333;
+            text-shadow: none;
+            width: auto;
+        }
+
+        #sottotitolo {
+            font-size: 13px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #666;
+            margin-top: 8px;
+            text-align: center;
+            transition: opacity 0.6s ease;
+        }
+
+        #titolo.small #sottotitolo {
+            display: none;
+        }
+        #overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(255,255,255,0.6);
+            z-index: 1999;
+            pointer-events: none;
+            transition: opacity 1.2s ease;
+        }
+
+        #overlay.hidden {
+            opacity: 0;
+        }
+
+        /* ── Indice ── */
+        #indice {
+            position: fixed;
+            bottom: 30px;
+            left: 15px;
+            z-index: 1000;
+            background: rgba(220,220,220,0.92);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 17px;
+            color: #222;
+            padding: 12px 16px;
+            min-width: 220px;
+        }
+
+        #indice h3 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #aaa;
+            padding-bottom: 6px;
+        }
+
+        /* ── Ricerca ── */
+        #ricerca-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        #ricerca-input {
+            width: 100%;
+            padding: 6px 10px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.85);
+            box-sizing: border-box;
+        }
+
+        #ricerca-risultati {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .risultato-item {
+            padding: 6px 10px;
+            cursor: pointer;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .risultato-item:hover { background: #e8e8e8; }
+
+        .risultato-categoria {
+            font-size: 11px;
+            color: #888;
+            margin-left: 4px;
+        }
+
+        /* ── Voci indice ── */
+        .indice-gruppo { margin-bottom: 6px; }
+
+        .indice-gruppo-titolo {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .indice-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 4px 0 4px 12px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .indice-item input[type="checkbox"],
+        .indice-gruppo-titolo input[type="checkbox"] {
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .legenda-linea {
+            display: inline-block;
+            width: 28px;
+            height: 4px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .legenda-icona {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        /* ── Popup ── */
+        .popup-titolo {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #222;
+        }
+
+        .popup-riga {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 13px;
+            color: #444;
+            margin: 2px 0;
+        }
+
+        .popup-label { font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay iniziale -->
+    <div id="overlay"></div>
+
+    <!-- Titolo -->
+    <div id="titolo">
+        Firenze delle Religioni
+        <div id="sottotitolo">esplora la mappa</div>
+    </div>
+
+    <!-- Mappa -->
+    <div id="map"></div>
+
+    <!-- Indice -->
+    <div id="indice">
+        <h3>Indice</h3>
+
+        <!-- Ricerca -->
+        <div id="ricerca-container">
+            <input type="text" id="ricerca-input" placeholder="🔍 Cerca comunità o indirizzo...">
+            <div id="ricerca-risultati"></div>
+        </div>
+
+        <!-- Gruppo Tram -->
+        <div class="indice-gruppo">
+            <div class="indice-gruppo-titolo">
+                <input type="checkbox" id="chk-tram" checked> Tram
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-t1" checked>
+                <span style="display:inline-block; width:30px; height:10px; border-top:3px solid #555; border-bottom:3px solid #555; background: repeating-linear-gradient(90deg, transparent 0px, transparent 4px, #555 4px, #555 5px); flex-shrink:0;"></span>
+                Tracciato Tram
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-fermate1" checked>
+                <span style="background:#2196F3; color:white; border-radius:50%; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; flex-shrink:0;">1</span>
+                Fermate L1
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-fermate2" checked>
+                <span style="background:#e63946; color:white; border-radius:50%; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; flex-shrink:0;">2</span>
+                Fermate L2
+            </div>
+        </div>
+
+        <!-- Gruppo Comunità Religiose -->
+        <div class="indice-gruppo">
+            <div class="indice-gruppo-titolo">
+                <input type="checkbox" id="chk-culto" checked> Comunità Religiose
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-cattolici" checked>
+                <span>✝️</span> Cristiane Cattoliche
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-ortodossi" checked>
+                <span>☦️</span> Cristiane Ortodosse
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-protestanti" checked>
+                <span>🛐</span> Evangeliche Protestanti
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-ebraiche" checked>
+                <span>✡️</span> Ebraiche
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-musulmane" checked>
+                <span>☪️</span> Musulmane
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-buddhiste" checked>
+                <span>☸️</span> Buddhiste
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-altre" checked>
+                <span>🟪</span> Altre Esperienze
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Plugin offset linee parallele -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-polylineoffset@1.1.1/leaflet.polylineoffset.js"></script>
+
+    <script>
+
+        // ── Animazione titolo ──
+        var titoloAnimato = false;
+
+        function animaTitolo() {
+            if (titoloAnimato) return;
+            titoloAnimato = true;
+            setTimeout(function() {
+                document.getElementById('titolo').classList.add('small');
+                document.getElementById('overlay').classList.add('hidden');
+            }, 300);
+            setTimeout(function() {
+                document.getElementById('overlay').style.display = 'none';
+            }, 1500);
+            document.removeEventListener('click', animaTitolo);
+            document.removeEventListener('mousemove', animaTitolo);
+            document.removeEventListener('touchstart', animaTitolo);
+        }
+
+        document.addEventListener('click', animaTitolo);
+        document.addEventListener('mousemove', animaTitolo);
+        document.addEventListener('touchstart', animaTitolo);
+        var map = L.map('map', {
+            center: [43.7696, 11.2558],
+            zoom: 13
+        });
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+            maxZoom: 19
+        }).addTo(map);
+
+        // ── Icone fermate tram (più piccole) ──
+        var iconaT1 = L.divIcon({
+            html: '<div style="background:#2196F3; color:white; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; font-family:Helvetica,sans-serif; box-shadow:0 1px 4px rgba(0,0,0,0.3);">1</div>',
+            iconSize: [20,20], iconAnchor: [10,10], popupAnchor: [0,-10], className: ''
+        });
+
+        var iconaT2 = L.divIcon({
+            html: '<div style="background:#e63946; color:white; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; font-family:Helvetica,sans-serif; box-shadow:0 1px 4px rgba(0,0,0,0.3);">2</div>',
+            iconSize: [20,20], iconAnchor: [10,10], popupAnchor: [0,-10], className: ''
+        });
+
+        // ── Layer tracciato unico stile binario ──
+        // Linea base grigia neutra
+        var layerTracciatiBase = L.geoJSON(null, {
+            style: {
+                color: '#999999',
+                weight: 2,
+                opacity: 0.9,
+                lineCap: 'round',
+                lineJoin: 'round'
+            }
+        });
+
+        // Tacche trasversali piccole
+        var layerTracciatiTacche = L.geoJSON(null, {
+            style: {
+                color: '#888888',
+                weight: 5,
+                opacity: 0.6,
+                dashArray: '1 10',
+                lineCap: 'square',
+                lineJoin: 'round'
+            }
+        });
+
+        // ── Layer fermate ──
+        function creaPopup(p, linea) {
+            var nome = p.nome_ferma || p.nome || 'Fermata';
+            var html = '<div class="popup-titolo">' + nome + '</div>';
+            html += '<div class="popup-riga"><span class="popup-label">Linea:</span> ' + linea + '</div>';
+            return html;
+        }
+
+        var layerFermateT1 = L.geoJSON(null, {
+            pointToLayer: function(f, ll) { return L.marker(ll, { icon: iconaT1 }); },
+            onEachFeature: function(f, l) { l.bindPopup(creaPopup(f.properties, '1')); }
+        });
+
+        var layerFermateT2 = L.geoJSON(null, {
+            pointToLayer: function(f, ll) { return L.marker(ll, { icon: iconaT2 }); },
+            onEachFeature: function(f, l) { l.bindPopup(creaPopup(f.properties, '2')); }
+        });
+
+        // ── Icone Comunità Religiose ──
+        function creaIconaEmoji(emoji) {
+            return L.divIcon({
+                html: '<div style="font-size:22px; line-height:28px; text-align:center; filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3));">' + emoji + '</div>',
+                iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14], className: ''
+            });
+        }
+
+        var iconaCattolici   = creaIconaEmoji('✝️');
+        var iconaOrtodossi   = creaIconaEmoji('☦️');
+        var iconaProtestanti = creaIconaEmoji('🛐');
+        var iconaEbraiche    = creaIconaEmoji('✡️');
+        var iconaMusulmane   = creaIconaEmoji('☪️');
+        var iconaBuddhiste   = creaIconaEmoji('☸️');
+        var iconaAltre       = creaIconaEmoji('🟪');
+
+        function creaPopupCulto(p) {
+            var html = '<div class="popup-titolo">' + (p.Nome || p.nome || '') + '</div>';
+            if (p.Sottocategoria || p.sottocategoria) html += '<div class="popup-riga"><span class="popup-label">Tipo:</span> ' + (p.Sottocategoria || p.sottocategoria) + '</div>';
+            if (p.Indirizzo || p.indirizzo) html += '<div class="popup-riga"><span class="popup-label">Indirizzo:</span> ' + (p.Indirizzo || p.indirizzo) + '</div>';
+            return html;
+        }
+
+        function creaLayer(icona) {
+            return L.geoJSON(null, {
+                pointToLayer: function(f,ll) { return L.marker(ll, { icon: icona }); },
+                onEachFeature: function(f,l) { l.bindPopup(creaPopupCulto(f.properties)); }
+            });
+        }
+
+        var layerCattolici   = creaLayer(iconaCattolici);
+        var layerOrtodossi   = creaLayer(iconaOrtodossi);
+        var layerProtestanti = creaLayer(iconaProtestanti);
+        var layerEbraiche    = creaLayer(iconaEbraiche);
+        var layerMusulmane   = creaLayer(iconaMusulmane);
+        var layerBuddhiste   = creaLayer(iconaBuddhiste);
+        var layerAltre       = creaLayer(iconaAltre);
+
+        function caricaLayer(file, layer) {
+            fetch(file + '.geojson')
+                .then(r=>r.json())
+                .then(d=>{ layer.addData(d); layer.addTo(map); aggiornaRicerca(); })
+                .catch(()=>console.warn(file + '.geojson non trovato'));
+        }
+
+        caricaLayer('CristianeCattoliche',   layerCattolici);
+        caricaLayer('CristianeOrtodosse',    layerOrtodossi);
+        caricaLayer('EvangelicheProtestanti',layerProtestanti);
+        caricaLayer('Ebraiche',              layerEbraiche);
+        caricaLayer('Musulmane',             layerMusulmane);
+        caricaLayer('Buddhiste',             layerBuddhiste);
+        caricaLayer('AltreEsperienze',       layerAltre);
+        fetch('TracciatiTram.geojson')
+            .then(r => r.json())
+            .then(data => {
+                data.features.forEach(function(f) {
+                    if (f.properties.linea === null) return;
+                    layerTracciatiBase.addData(f);
+                    layerTracciatiTacche.addData(f);
+                });
+                layerTracciatiBase.addTo(map);
+                layerTracciatiTacche.addTo(map);
+            })
+            .catch(function() { console.warn('TracciatiTram.geojson non trovato'); });
+
+        // ── Carica Fermate ──
+        fetch('FermateTram.geojson')
+            .then(r => r.json())
+            .then(data => {
+                data.features.forEach(function(f) {
+                    var linea = f.properties.linea;
+                    if (linea == 1) layerFermateT1.addData(f);
+                    else if (linea == 2) layerFermateT2.addData(f);
+                });
+                layerFermateT1.addTo(map);
+                layerFermateT2.addTo(map);
+                aggiornaRicerca();
+            })
+            .catch(function() { console.warn('FermateTram.geojson non trovato'); });
+
+        // ── Controlli indice ──
+        function toggleLayer(layer, visible) {
+            if (visible) map.addLayer(layer);
+            else map.removeLayer(layer);
+        }
+
+        document.getElementById('chk-t1').addEventListener('change', function() {
+            toggleLayer(layerTracciatiBase, this.checked);
+            toggleLayer(layerTracciatiTacche, this.checked);
+        });
+        document.getElementById('chk-fermate1').addEventListener('change', function() {
+            toggleLayer(layerFermateT1, this.checked);
+        });
+        document.getElementById('chk-fermate2').addEventListener('change', function() {
+            toggleLayer(layerFermateT2, this.checked);
+        });
+
+        document.getElementById('chk-tram').addEventListener('change', function() {
+            var checked = this.checked;
+            ['chk-t1','chk-fermate1','chk-fermate2'].forEach(function(id) {
+                var chk = document.getElementById(id);
+                chk.checked = checked;
+                chk.dispatchEvent(new Event('change'));
+            });
+        });
+
+        document.getElementById('chk-cattolici').addEventListener('change',   function() { toggleLayer(layerCattolici, this.checked); });
+        document.getElementById('chk-ortodossi').addEventListener('change',   function() { toggleLayer(layerOrtodossi, this.checked); });
+        document.getElementById('chk-protestanti').addEventListener('change', function() { toggleLayer(layerProtestanti, this.checked); });
+        document.getElementById('chk-ebraiche').addEventListener('change',    function() { toggleLayer(layerEbraiche, this.checked); });
+        document.getElementById('chk-musulmane').addEventListener('change',   function() { toggleLayer(layerMusulmane, this.checked); });
+        document.getElementById('chk-buddhiste').addEventListener('change',   function() { toggleLayer(layerBuddhiste, this.checked); });
+        document.getElementById('chk-altre').addEventListener('change',       function() { toggleLayer(layerAltre, this.checked); });
+
+        document.getElementById('chk-culto').addEventListener('change', function() {
+            var checked = this.checked;
+            ['chk-cattolici','chk-ortodossi','chk-protestanti','chk-ebraiche','chk-musulmane','chk-buddhiste','chk-altre'].forEach(function(id) {
+                var chk = document.getElementById(id);
+                chk.checked = checked;
+                chk.dispatchEvent(new Event('change'));
+            });
+        });
+        var tuttiIPunti = [];
+
+        function aggiornaRicerca() {
+            tuttiIPunti = [];
+            [layerFermateT1, layerFermateT2].forEach(function(layer, i) {
+                layer.eachLayer(function(l) {
+                    var p = l.feature && l.feature.properties;
+                    var nome = p && (p.nome_ferma || p.nome || '');
+                    if (nome) tuttiIPunti.push({ nome: nome, categoria: 'Fermata L' + (i+1), layer: l });
+                });
+            });
+            [
+                [layerCattolici,   'Cristiane Cattoliche'],
+                [layerOrtodossi,   'Cristiane Ortodosse'],
+                [layerProtestanti, 'Evangeliche Protestanti'],
+                [layerEbraiche,    'Ebraiche'],
+                [layerMusulmane,   'Musulmane'],
+                [layerBuddhiste,   'Buddhiste'],
+                [layerAltre,       'Altre Esperienze']
+            ].forEach(function(item) {
+                item[0].eachLayer(function(l) {
+                    var p = l.feature && l.feature.properties;
+                    var nome = p && (p.Nome || p.nome || '');
+                    if (nome) tuttiIPunti.push({ nome: nome, categoria: item[1], layer: l });
+                });
+            });
+        }
+
+        var ricercaTimeout;
+        document.getElementById('ricerca-input').addEventListener('input', function() {
+            clearTimeout(ricercaTimeout);
+            var query = this.value.trim();
+            var risultati = document.getElementById('ricerca-risultati');
+
+            if (query.length < 2) { risultati.style.display = 'none'; return; }
+
+            risultati.innerHTML = '';
+            risultati.style.display = 'block';
+
+            // Fermate locali
+            tuttiIPunti
+                .filter(p => p.nome.toLowerCase().includes(query.toLowerCase()))
+                .forEach(function(p) {
+                    var div = document.createElement('div');
+                    div.className = 'risultato-item';
+                    div.innerHTML = p.nome + ' <span class="risultato-categoria">(' + p.categoria + ')</span>';
+                    div.addEventListener('click', function() {
+                        map.setView(p.layer.getLatLng(), 16);
+                        p.layer.openPopup();
+                        risultati.style.display = 'none';
+                        document.getElementById('ricerca-input').value = p.nome;
+                    });
+                    risultati.appendChild(div);
+                });
+
+            // Indirizzi Nominatim
+            ricercaTimeout = setTimeout(function() {
+                fetch('https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(query + ' Firenze') + '&format=json&limit=3')
+                    .then(r => r.json())
+                    .then(data => {
+                        data.forEach(function(item) {
+                            var div = document.createElement('div');
+                            div.className = 'risultato-item';
+                            div.innerHTML = item.display_name.split(',').slice(0,2).join(', ') + ' <span class="risultato-categoria">(indirizzo)</span>';
+                            div.addEventListener('click', function() {
+                                map.setView([parseFloat(item.lat), parseFloat(item.lon)], 16);
+                                risultati.style.display = 'none';
+                                document.getElementById('ricerca-input').value = item.display_name.split(',')[0];
+                            });
+                            risultati.appendChild(div);
+                        });
+                    });
+            }, 400);
+        });
+
+        // Chiudi risultati cliccando fuori
+        document.addEventListener('click', function(e) {
+            if (!document.getElementById('ricerca-container').contains(e.target)) {
+                document.getElementById('ricerca-risultati').style.display = 'none';
+            }
+        });
+
+    </script>
+</body>
+</html>
