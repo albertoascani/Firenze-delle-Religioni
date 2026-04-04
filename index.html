@@ -238,7 +238,7 @@
 
         <!-- Ricerca -->
         <div id="ricerca-container">
-            <input type="text" id="ricerca-input" placeholder="🔍 Cerca fermata o indirizzo...">
+            <input type="text" id="ricerca-input" placeholder="🔍 Cerca comunità o indirizzo...">
             <div id="ricerca-risultati"></div>
         </div>
 
@@ -264,22 +264,38 @@
             </div>
         </div>
 
-        <!-- Gruppo Luoghi di Culto -->
+        <!-- Gruppo Comunità Religiose -->
         <div class="indice-gruppo">
             <div class="indice-gruppo-titolo">
-                <input type="checkbox" id="chk-culto" checked> Luoghi di Culto
+                <input type="checkbox" id="chk-culto" checked> Comunità Religiose
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-cattolici" checked>
-                <span>✝️</span> Cristiani Cattolici
+                <span>✝️</span> Cristiane Cattoliche
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-ortodossi" checked>
-                <span>☦️</span> Cristiani Ortodossi
+                <span>☦️</span> Cristiane Ortodosse
             </div>
             <div class="indice-item">
                 <input type="checkbox" id="chk-protestanti" checked>
-                <span>🛐</span> Evangelici Protestanti
+                <span>🛐</span> Evangeliche Protestanti
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-ebraiche" checked>
+                <span>✡️</span> Ebraiche
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-musulmane" checked>
+                <span>☪️</span> Musulmane
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-buddhiste" checked>
+                <span>☸️</span> Buddhiste
+            </div>
+            <div class="indice-item">
+                <input type="checkbox" id="chk-altre" checked>
+                <span>🟪</span> Altre Esperienze
             </div>
         </div>
 
@@ -323,15 +339,15 @@
             maxZoom: 19
         }).addTo(map);
 
-        // ── Icone fermate ──
+        // ── Icone fermate tram (più piccole) ──
         var iconaT1 = L.divIcon({
-            html: '<div style="background:#2196F3; color:white; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:bold; font-family:Helvetica,sans-serif; box-shadow:0 1px 4px rgba(0,0,0,0.3);">1</div>',
-            iconSize: [26,26], iconAnchor: [13,13], popupAnchor: [0,-13], className: ''
+            html: '<div style="background:#2196F3; color:white; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; font-family:Helvetica,sans-serif; box-shadow:0 1px 4px rgba(0,0,0,0.3);">1</div>',
+            iconSize: [20,20], iconAnchor: [10,10], popupAnchor: [0,-10], className: ''
         });
 
         var iconaT2 = L.divIcon({
-            html: '<div style="background:#e63946; color:white; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:bold; font-family:Helvetica,sans-serif; box-shadow:0 1px 4px rgba(0,0,0,0.3);">2</div>',
-            iconSize: [26,26], iconAnchor: [13,13], popupAnchor: [0,-13], className: ''
+            html: '<div style="background:#e63946; color:white; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; font-family:Helvetica,sans-serif; box-shadow:0 1px 4px rgba(0,0,0,0.3);">2</div>',
+            iconSize: [20,20], iconAnchor: [10,10], popupAnchor: [0,-10], className: ''
         });
 
         // ── Layer tracciato unico stile binario ──
@@ -376,10 +392,21 @@
             onEachFeature: function(f, l) { l.bindPopup(creaPopup(f.properties, '2')); }
         });
 
-        // ── Icone Luoghi di Culto ──
-        var iconaCattolici = L.divIcon({ html: '<div style="font-size:24px; line-height:28px; text-align:center;">✝️</div>', iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14], className: '' });
-        var iconaOrtodossi = L.divIcon({ html: '<div style="font-size:24px; line-height:28px; text-align:center;">☦️</div>', iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14], className: '' });
-        var iconaProtestanti = L.divIcon({ html: '<div style="font-size:24px; line-height:28px; text-align:center;">🛐</div>', iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14], className: '' });
+        // ── Icone Comunità Religiose ──
+        function creaIconaEmoji(emoji) {
+            return L.divIcon({
+                html: '<div style="font-size:22px; line-height:28px; text-align:center; filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3));">' + emoji + '</div>',
+                iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14], className: ''
+            });
+        }
+
+        var iconaCattolici   = creaIconaEmoji('✝️');
+        var iconaOrtodossi   = creaIconaEmoji('☦️');
+        var iconaProtestanti = creaIconaEmoji('🛐');
+        var iconaEbraiche    = creaIconaEmoji('✡️');
+        var iconaMusulmane   = creaIconaEmoji('☪️');
+        var iconaBuddhiste   = creaIconaEmoji('☸️');
+        var iconaAltre       = creaIconaEmoji('🟪');
 
         function creaPopupCulto(p) {
             var html = '<div class="popup-titolo">' + (p.Nome || p.nome || '') + '</div>';
@@ -388,22 +415,35 @@
             return html;
         }
 
-        var layerCattolici = L.geoJSON(null, {
-            pointToLayer: function(f,ll) { return L.marker(ll, { icon: iconaCattolici }); },
-            onEachFeature: function(f,l) { l.bindPopup(creaPopupCulto(f.properties)); }
-        });
-        var layerOrtodossi = L.geoJSON(null, {
-            pointToLayer: function(f,ll) { return L.marker(ll, { icon: iconaOrtodossi }); },
-            onEachFeature: function(f,l) { l.bindPopup(creaPopupCulto(f.properties)); }
-        });
-        var layerProtestanti = L.geoJSON(null, {
-            pointToLayer: function(f,ll) { return L.marker(ll, { icon: iconaProtestanti }); },
-            onEachFeature: function(f,l) { l.bindPopup(creaPopupCulto(f.properties)); }
-        });
+        function creaLayer(icona) {
+            return L.geoJSON(null, {
+                pointToLayer: function(f,ll) { return L.marker(ll, { icon: icona }); },
+                onEachFeature: function(f,l) { l.bindPopup(creaPopupCulto(f.properties)); }
+            });
+        }
 
-        fetch('CristianiCattolici.geojson').then(r=>r.json()).then(d=>{ layerCattolici.addData(d); layerCattolici.addTo(map); aggiornaRicerca(); }).catch(()=>console.warn('CristianiCattolici.geojson non trovato'));
-        fetch('CristianiOrtodossi.geojson').then(r=>r.json()).then(d=>{ layerOrtodossi.addData(d); layerOrtodossi.addTo(map); aggiornaRicerca(); }).catch(()=>console.warn('CristianiOrtodossi.geojson non trovato'));
-        fetch('EvangeliciProtestanti.geojson').then(r=>r.json()).then(d=>{ layerProtestanti.addData(d); layerProtestanti.addTo(map); aggiornaRicerca(); }).catch(()=>console.warn('EvangeliciProtestanti.geojson non trovato'));
+        var layerCattolici   = creaLayer(iconaCattolici);
+        var layerOrtodossi   = creaLayer(iconaOrtodossi);
+        var layerProtestanti = creaLayer(iconaProtestanti);
+        var layerEbraiche    = creaLayer(iconaEbraiche);
+        var layerMusulmane   = creaLayer(iconaMusulmane);
+        var layerBuddhiste   = creaLayer(iconaBuddhiste);
+        var layerAltre       = creaLayer(iconaAltre);
+
+        function caricaLayer(file, layer) {
+            fetch(file + '.geojson')
+                .then(r=>r.json())
+                .then(d=>{ layer.addData(d); layer.addTo(map); aggiornaRicerca(); })
+                .catch(()=>console.warn(file + '.geojson non trovato'));
+        }
+
+        caricaLayer('CristianeCattoliche',   layerCattolici);
+        caricaLayer('CristianeOrtodosse',    layerOrtodossi);
+        caricaLayer('EvangelicheProtestanti',layerProtestanti);
+        caricaLayer('Ebraiche',              layerEbraiche);
+        caricaLayer('Musulmane',             layerMusulmane);
+        caricaLayer('Buddhiste',             layerBuddhiste);
+        caricaLayer('AltreEsperienze',       layerAltre);
         fetch('TracciatiTram.geojson')
             .then(r => r.json())
             .then(data => {
@@ -458,14 +498,17 @@
             });
         });
 
-        // Gruppo Luoghi di Culto
-        document.getElementById('chk-cattolici').addEventListener('change', function() { toggleLayer(layerCattolici, this.checked); });
-        document.getElementById('chk-ortodossi').addEventListener('change', function() { toggleLayer(layerOrtodossi, this.checked); });
+        document.getElementById('chk-cattolici').addEventListener('change',   function() { toggleLayer(layerCattolici, this.checked); });
+        document.getElementById('chk-ortodossi').addEventListener('change',   function() { toggleLayer(layerOrtodossi, this.checked); });
         document.getElementById('chk-protestanti').addEventListener('change', function() { toggleLayer(layerProtestanti, this.checked); });
+        document.getElementById('chk-ebraiche').addEventListener('change',    function() { toggleLayer(layerEbraiche, this.checked); });
+        document.getElementById('chk-musulmane').addEventListener('change',   function() { toggleLayer(layerMusulmane, this.checked); });
+        document.getElementById('chk-buddhiste').addEventListener('change',   function() { toggleLayer(layerBuddhiste, this.checked); });
+        document.getElementById('chk-altre').addEventListener('change',       function() { toggleLayer(layerAltre, this.checked); });
 
         document.getElementById('chk-culto').addEventListener('change', function() {
             var checked = this.checked;
-            ['chk-cattolici','chk-ortodossi','chk-protestanti'].forEach(function(id) {
+            ['chk-cattolici','chk-ortodossi','chk-protestanti','chk-ebraiche','chk-musulmane','chk-buddhiste','chk-altre'].forEach(function(id) {
                 var chk = document.getElementById(id);
                 chk.checked = checked;
                 chk.dispatchEvent(new Event('change'));
@@ -482,7 +525,15 @@
                     if (nome) tuttiIPunti.push({ nome: nome, categoria: 'Fermata L' + (i+1), layer: l });
                 });
             });
-            [[layerCattolici,'Cattolici'],[layerOrtodossi,'Ortodossi'],[layerProtestanti,'Protestanti']].forEach(function(item) {
+            [
+                [layerCattolici,   'Cristiane Cattoliche'],
+                [layerOrtodossi,   'Cristiane Ortodosse'],
+                [layerProtestanti, 'Evangeliche Protestanti'],
+                [layerEbraiche,    'Ebraiche'],
+                [layerMusulmane,   'Musulmane'],
+                [layerBuddhiste,   'Buddhiste'],
+                [layerAltre,       'Altre Esperienze']
+            ].forEach(function(item) {
                 item[0].eachLayer(function(l) {
                     var p = l.feature && l.feature.properties;
                     var nome = p && (p.Nome || p.nome || '');
