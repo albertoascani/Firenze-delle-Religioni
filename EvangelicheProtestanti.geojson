@@ -1,10 +1,10 @@
 {
 "type": "FeatureCollection",
-"name": "EvalgelicheProtestanti",
+"name": "EvangelicheProtestanti",
 "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
 "features": [
 { "type": "Feature", "properties": { "Categoria": "Evangelica / protestante", "Sottocategoria": "Valdese", "Nome": "Chiesa Valdese di Firenze", "Indirizzo": "Via Micheli 26, 50121, Firenze", "Latitude": 43.780239486885243, "Longitude": 11.260982010981818 }, "geometry": { "type": "Point", "coordinates": [ 11.260982010981818, 43.780239486885243 ] } },
-{ "type": "Feature", "properties": { "Categoria": "Evangelica / protestante", "Sottocategoria": "Luterana", "Nome": "Comunità Evangelica Luterana di Firenze", "Indirizzo": "Lungarno Torrigiani, 11, 50125, Firenze", "Latitude": 43.766816630106817, "Longitude": 11.255624924474706 }, "geometry": { "type": "Point", "coordinates": [ 11.255624924474706, 43.766816630106817 ] } },
+{ "type": "Feature", "properties": { "Categoria": "Evangelica / protestante", "Sottocategoria": "Luterana", "Nome": "Comunità Evangelica Luterana di Firenze", "Indirizzo": "Lungarno Torrigiani, 11, 50125, Firenze", "Latitude": 43.765579812182168, "Longitude": 11.257116688853253 }, "geometry": { "type": "Point", "coordinates": [ 11.257116688853253, 43.765579812182168 ] } },
 { "type": "Feature", "properties": { "Categoria": "Evangelica / protestante", "Sottocategoria": "Anglicana", "Nome": "St Mark’s English Church", "Indirizzo": "Via Maggio 16/18, 50125, Firenze", "Latitude": 43.76752022312165, "Longitude": 11.249280839816803 }, "geometry": { "type": "Point", "coordinates": [ 11.249280839816803, 43.76752022312165 ] } },
 { "type": "Feature", "properties": { "Categoria": "Evangelica / protestante", "Sottocategoria": "Battista", "Nome": "Chiesa Battista della Riconciliazione", "Indirizzo": "Via Borgo Ognissanti 4, 50123, Firenze", "Latitude": 43.771388057471015, "Longitude": 11.247316862692108 }, "geometry": { "type": "Point", "coordinates": [ 11.247316862692108, 43.771388057471015 ] } },
 { "type": "Feature", "properties": { "Categoria": "Evangelica / protestante", "Sottocategoria": "Evangelica", "Nome": "The Life Church Italia – Firenze", "Indirizzo": "Via di Novoli 2, 50127, Firenze", "Latitude": 43.790504196815967, "Longitude": 1.227754063341935 }, "geometry": { "type": "Point", "coordinates": [ 1.227754063341935, 43.790504196815967 ] } }
