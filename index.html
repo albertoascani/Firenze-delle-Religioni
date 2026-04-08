@@ -65,18 +65,6 @@
             transition: opacity 0.6s ease;
         }
 
-        @media (max-width: 600px) {
-            #titolo {
-                font-size: clamp(26px, 7vw, 48px) !important;
-                font-weight: 300 !important;
-            }
-            #sottotitolo {
-                font-size: 14px !important;
-                font-weight: 400 !important;
-                letter-spacing: 2px !important;
-            }
-        }
-
         #titolo.small #sottotitolo {
             display: none;
         }
@@ -108,21 +96,6 @@
             color: #222;
             padding: 12px 16px;
             min-width: 220px;
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-
-        /* Su mobile più compatto e scorrevole */
-        @media (max-width: 600px) {
-            #indice {
-                bottom: 10px;
-                left: 10px;
-                right: 10px;
-                min-width: unset;
-                max-height: 40vh;
-                font-size: 14px;
-                padding: 8px 12px;
-            }
         }
 
         #indice h3 {
