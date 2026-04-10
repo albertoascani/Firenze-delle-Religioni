@@ -115,23 +115,31 @@
         /* Su mobile più compatto e scorrevole */
         @media (max-width: 600px) {
             #titolo {
-                font-size: clamp(26px, 7vw, 48px) !important;
+                font-size: clamp(15px, 4vw, 22px) !important;
                 font-weight: 300 !important;
                 white-space: normal !important;
-                width: 85vw !important;
+                width: 80vw !important;
+                left: 50% !important;
                 text-align: center !important;
             }
             #sottotitolo {
-                font-size: 12px !important;
+                font-size: 11px !important;
                 font-weight: 400 !important;
                 letter-spacing: 2px !important;
+            }
+            /* Sposta zoom in basso a destra su mobile */
+            .leaflet-top.leaflet-left {
+                top: auto !important;
+                bottom: 120px !important;
+                left: auto !important;
+                right: 10px !important;
             }
             #indice {
                 bottom: 10px !important;
                 left: 10px !important;
                 right: auto !important;
                 min-width: unset !important;
-                width: 170px !important;
+                width: 210px !important;
                 max-height: 35vh !important;
                 font-size: 12px !important;
                 padding: 6px 10px !important;
