@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRISMA — Portale della Diversità Religiosa a Firenze</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', Helvetica, Arial, sans-serif;
+            background: #fafafa;
+            color: #1a1a1a;
+        }
+
+        /* ── HERO ── */
+        #hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: #fafafa;
+            position: relative;
+        }
+
+        #hero-titolo {
+            font-size: clamp(52px, 12vw, 120px);
+            font-weight: 200;
+            letter-spacing: clamp(8px, 3vw, 24px);
+            text-transform: uppercase;
+            color: #1a1a1a;
+            line-height: 1;
+        }
+
+        #hero-sottotitolo {
+            font-size: clamp(11px, 2vw, 15px);
+            font-weight: 300;
+            letter-spacing: clamp(2px, 1vw, 6px);
+            text-transform: uppercase;
+            color: #777;
+            margin-top: 16px;
+        }
+
+        #hero-scroll {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #aaa;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* ── NAVBAR ── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 40px;
+            background: rgba(250,250,250,0.92);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo {
+            font-size: 16px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #1a1a1a;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 12px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #555;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: #1a1a1a; }
+
+        /* ── SEZIONE INTRO ── */
+        #intro {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 100px 40px;
+        }
+
+        .sezione-label {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #aaa;
+            margin-bottom: 24px;
+        }
+
+        .sezione-titolo {
+            font-size: clamp(24px, 4vw, 36px);
+            font-weight: 200;
+            color: #1a1a1a;
+            line-height: 1.3;
+            margin-bottom: 32px;
+        }
+
+        .sezione-testo {
+            font-size: 16px;
+            font-weight: 300;
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        /* ── SEZIONE NUMERI ── */
+        #numeri {
+            background: #f0f0f0;
+            padding: 80px 40px;
+        }
+
+        .numeri-grid {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+
+        .numero-item h2 {
+            font-size: clamp(36px, 6vw, 56px);
+            font-weight: 200;
+            color: #1a1a1a;
+            letter-spacing: 2px;
+        }
+
+        .numero-item p {
+            font-size: 12px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        /* ── SEZIONE COMUNITÀ ── */
+        #comunita {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 100px 40px;
+        }
+
+        .comunita-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 40px;
+        }
+
+        .comunita-card {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .comunita-card:hover {
+            border-color: #ccc;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            transform: translateY(-2px);
+        }
+
+        .comunita-emoji {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .comunita-nome {
+            font-size: 13px;
+            font-weight: 400;
+            color: #333;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── SEZIONE MAPPA ── */
+        #sezione-mappa {
+            padding: 100px 40px 0;
+        }
+
+        #sezione-mappa .sezione-label,
+        #sezione-mappa .sezione-titolo {
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #sezione-mappa .sezione-titolo {
+            margin-bottom: 48px;
+        }
+
+        #map-container {
+            position: relative;
+            width: 100%;
+            height: 75vh;
+            min-height: 500px;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Indice mappa */
+        #indice {
+            position: absolute;
+            bottom: 30px;
+            left: 15px;
+            z-index: 1000;
+            background: rgba(245,245,245,0.96);
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: #222;
+            padding: 12px 16px;
+            min-width: 220px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        #indice h3 {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 8px;
+        }
+
+        #ricerca-container { position: relative; margin-bottom: 10px; }
+
+        #ricerca-input {
+            width: 100%;
+            padding: 6px 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 300;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            box-sizing: border-box;
+            color: #333;
+        }
+
+        #ricerca-risultati {
+            position: absolute;
+            top: 100%;
+            left: 0; right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .risultato-item {
+            padding: 7px 10px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 400;
+            border-bottom: 1px solid #f5f5f5;
+            color: #333;
+        }
+
+        .risultato-item:hover { background: #f9f9f9; }
+        .risultato-categoria { font-size: 10px; color: #aaa; margin-left: 4px; }
+
+        .indice-gruppo { margin-bottom: 8px; }
+
+        .indice-gruppo-titolo {
+            font-weight: 500;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #555;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .indice-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 3px 0 3px 10px;
+            font-size: 12px;
+            font-weight: 300;
+            cursor: pointer;
+            color: #444;
+        }
+
+        .indice-item input, .indice-gruppo-titolo input {
+            width: 13px; height: 13px;
+            cursor: pointer; flex-shrink: 0;
+        }
+
+        /* ── POPUP ── */
+        .popup-titolo {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px; font-weight: 500;
+            margin-bottom: 5px; color: #1a1a1a;
+        }
+        .popup-riga {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px; font-weight: 300; color: #666; margin: 2px 0;
+        }
+        .popup-label { font-weight: 500; color: #444; }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #1a1a1a;
+            color: #888;
+            text-align: center;
+            padding: 40px;
+            font-size: 12px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-top: 80px;
+        }
+
+        footer span { color: #555; }
+
+        /* ── MOBILE ── */
+        @media (max-width: 600px) {
+            nav { padding: 14px 20px; }
+            .nav-links { gap: 16px; }
+            .nav-links a { font-size: 11px; }
+            #intro, #comunita, #sezione-mappa { padding: 60px 20px 0; }
+            #numeri { padding: 60px 20px; }
+            #indice { width: 200px; font-size: 12px; padding: 8px 12px; max-height: 35vh; }
+            .leaflet-top.leaflet-left { top: auto !important; bottom: 100px !important; left: auto !important; right: 10px !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <a href="index.html" class="nav-logo">PRISMA</a>
+        <ul class="nav-links">
+            <li><a href="#sezione-mappa">Mappa</a></li>
+            <li><a href="#comunita">Comunità</a></li>
+            <li><a href="about.html">Il Progetto</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero -->
+    <section id="hero">
+        <div id="hero-titolo">PRISMA</div>
+        <div id="hero-sottotitolo">Portale della Diversità Religiosa a Firenze</div>
+        <div id="hero-scroll">↓ &nbsp; scorri</div>
+    </section>
+
+    <!-- Intro -->
+    <section id="intro">
+        <div class="sezione-label">Il Progetto</div>
+        <h2 class="sezione-titolo">Una mappa per conoscere le comunità religiose di Firenze</h2>
+        <p class="sezione-testo">PRISMA è uno strumento di conoscenza e orientamento dedicato alla pluralità religiosa presente nel territorio fiorentino. Attraverso una mappa interattiva e schede di approfondimento, il portale documenta luoghi di culto, comunità e servizi legati alle diverse tradizioni religiose presenti in città.</p>
+        <p class="sezione-testo">Il progetto nasce dall'esigenza di rendere visibile e accessibile un patrimonio di diversità culturale e spirituale spesso poco conosciuto, favorendo la conoscenza reciproca e l'orientamento per residenti, istituzioni e nuovi arrivati.</p>
+    </section>
+
+    <!-- Numeri -->
+    <section id="numeri">
+        <div class="numeri-grid">
+            <div class="numero-item">
+                <h2>7</h2>
+                <p>Comunità mappate</p>
+            </div>
+            <div class="numero-item">
+                <h2>40+</h2>
+                <p>Luoghi di culto</p>
+            </div>
+            <div class="numero-item">
+                <h2>1</h2>
+                <p>Città</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comunità -->
+    <section id="comunita">
+        <div class="sezione-label">Esplora</div>
+        <h2 class="sezione-titolo">Le comunità religiose</h2>
+        <div class="comunita-grid">
+            <a href="comunita/cattolici.html" class="comunita-card">
+                <div class="comunita-emoji">✝️</div>
+                <div class="comunita-nome">Cristiane Cattoliche</div>
+            </a>
+            <a href="comunita/ortodossi.html" class="comunita-card">
+                <div class="comunita-emoji">☦️</div>
+                <div class="comunita-nome">Cristiane Ortodosse</div>
+            </a>
+            <a href="comunita/protestanti.html" class="comunita-card">
+                <div class="comunita-emoji">🛐</div>
+                <div class="comunita-nome">Evangeliche Protestanti</div>
+            </a>
+            <a href="comunita/ebraiche.html" class="comunita-card">
+                <div class="comunita-emoji">✡️</div>
+                <div class="comunita-nome">Ebraiche</div>
+            </a>
+            <a href="comunita/musulmane.html" class="comunita-card">
+                <div class="comunita-emoji">☪️</div>
+                <div class="comunita-nome">Musulmane</div>
+            </a>
+            <a href="comunita/buddhiste.html" class="comunita-card">
+                <div class="comunita-emoji">☸️</div>
+                <div class="comunita-nome">Buddhiste</div>
+            </a>
+            <a href="comunita/altre.html" class="comunita-card">
+                <div class="comunita-emoji">🟪</div>
+                <div class="comunita-nome">Altre Esperienze</div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Mappa -->
+    <section id="sezione-mappa">
+        <div class="sezione-label">Mappa Interattiva</div>
+        <h2 class="sezione-titolo">Esplora la città</h2>
+        <div id="map-container">
+            <div id="map"></div>
+            <div id="indice">
+                <h3>Indice</h3>
+                <div id="ricerca-container">
+                    <input type="text" id="ricerca-input" placeholder="🔍 Cerca comunità o indirizzo...">
+                    <div id="ricerca-risultati"></div>
+                </div>
+                <div class="indice-gruppo">
+                    <div class="indice-gruppo-titolo">
+                        <input type="checkbox" id="chk-tram"> Tram
+                    </div>
+                    <div class="indice-item">
+                        <input type="checkbox" id="chk-t1">
+                        <span style="display:inline-block;width:28px;height:8px;background:repeating-linear-gradient(90deg,transparent 0,transparent 4px,#888 4px,#888 5px);border-top:2px solid #999;border-bottom:2px solid #999;flex-shrink:0;"></span>
+                        Tracciato
+                    </div>
+                    <div class="indice-item">
+                        <input type="checkbox" id="chk-fermate1">
+                        <span style="background:#2196F3;color:white;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;">1</span>
+                        Fermate L1
+                    </div>
+                    <div class="indice-item">
+                        <input type="checkbox" id="chk-fermate2">
+                        <span style="background:#e63946;color:white;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;">2</span>
+                        Fermate L2
+                    </div>
+                </div>
+                <div class="indice-gruppo">
+                    <div class="indice-gruppo-titolo">
+                        <input type="checkbox" id="chk-culto" checked> Comunità Religiose
+                    </div>
+                    <div class="indice-item"><input type="checkbox" id="chk-cattolici" checked><span>✝️</span> Cristiane Cattoliche</div>
+                    <div class="indice-item"><input type="checkbox" id="chk-ortodossi" checked><span>☦️</span> Cristiane Ortodosse</div>
+                    <div class="indice-item"><input type="checkbox" id="chk-protestanti" checked><span>🛐</span> Evangeliche Protestanti</div>
+                    <div class="indice-item"><input type="checkbox" id="chk-ebraiche" checked><span>✡️</span> Ebraiche</div>
+                    <div class="indice-item"><input type="checkbox" id="chk-musulmane" checked><span>☪️</span> Musulmane</div>
+                    <div class="indice-item"><input type="checkbox" id="chk-buddhiste" checked><span>☸️</span> Buddhiste</div>
+                    <div class="indice-item"><input type="checkbox" id="chk-altre" checked><span>🟪</span> Altre Esperienze</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>PRISMA — Portale della Diversità Religiosa a Firenze</p>
+        <p style="margin-top:8px;"><span>Dati: Comune di Firenze Open Data · OpenStreetMap</span></p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        var map = L.map('map', { center: [43.7696, 11.2558], zoom: 13 });
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 19
+        }).addTo(map);
+
+        // Icone tram
+        var iconaT1 = L.divIcon({ html: '<div style="background:#2196F3;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;font-family:Inter,sans-serif;box-shadow:0 1px 4px rgba(0,0,0,0.3);">1</div>', iconSize:[20,20], iconAnchor:[10,10], popupAnchor:[0,-10], className:'' });
+        var iconaT2 = L.divIcon({ html: '<div style="background:#e63946;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;font-family:Inter,sans-serif;box-shadow:0 1px 4px rgba(0,0,0,0.3);">2</div>', iconSize:[20,20], iconAnchor:[10,10], popupAnchor:[0,-10], className:'' });
+
+        // Tracciati
+        var layerTracciatiBase = L.geoJSON(null, { style:{ color:'#999', weight:2, opacity:0.9, lineCap:'round', lineJoin:'round' } });
+        var layerTracciatiTacche = L.geoJSON(null, { style:{ color:'#888', weight:5, opacity:0.6, dashArray:'1 10', lineCap:'square' } });
+
+        // Fermate
+        var layerFermateT1 = L.geoJSON(null, {
+            pointToLayer: function(f,ll){ return L.marker(ll,{icon:iconaT1}); },
+            onEachFeature: function(f,l){ l.bindPopup('<div class="popup-titolo">'+(f.properties.nome_ferma||f.properties.nome||'Fermata')+'</div><div class="popup-riga"><span class="popup-label">Linea:</span> 1</div>'); }
+        });
+        var layerFermateT2 = L.geoJSON(null, {
+            pointToLayer: function(f,ll){ return L.marker(ll,{icon:iconaT2}); },
+            onEachFeature: function(f,l){ l.bindPopup('<div class="popup-titolo">'+(f.properties.nome_ferma||f.properties.nome||'Fermata')+'</div><div class="popup-riga"><span class="popup-label">Linea:</span> 2</div>'); }
+        });
+
+        // Icone comunità
+        function creaIconaEmoji(e) {
+            return L.divIcon({ html:'<div style="font-size:22px;line-height:28px;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3));">'+e+'</div>', iconSize:[28,28], iconAnchor:[14,14], popupAnchor:[0,-14], className:'' });
+        }
+
+        function creaPopup(p) {
+            var html = '<div class="popup-titolo">'+(p.Nome||p.nome||'')+'</div>';
+            if (p.Sottocategoria||p.sottocategoria) html += '<div class="popup-riga"><span class="popup-label">Tipo:</span> '+(p.Sottocategoria||p.sottocategoria)+'</div>';
+            if (p.Indirizzo||p.indirizzo) html += '<div class="popup-riga"><span class="popup-label">Indirizzo:</span> '+(p.Indirizzo||p.indirizzo)+'</div>';
+            return html;
+        }
+
+        function creaLayer(emoji) {
+            return L.geoJSON(null, {
+                pointToLayer: function(f,ll){ return L.marker(ll,{icon:creaIconaEmoji(emoji)}); },
+                onEachFeature: function(f,l){ l.bindPopup(creaPopup(f.properties)); }
+            });
+        }
+
+        var layerCattolici   = creaLayer('✝️');
+        var layerOrtodossi   = creaLayer('☦️');
+        var layerProtestanti = creaLayer('🛐');
+        var layerEbraiche    = creaLayer('✡️');
+        var layerMusulmane   = creaLayer('☪️');
+        var layerBuddhiste   = creaLayer('☸️');
+        var layerAltre       = creaLayer('🟪');
+
+        // Carica dati
+        fetch('data/TracciatiTram.geojson').then(r=>r.json()).then(d=>{
+            d.features.forEach(f=>{ if(f.properties.linea===null) return; layerTracciatiBase.addData(f); layerTracciatiTacche.addData(f); });
+        }).catch(()=>{});
+
+        fetch('data/FermateTram.geojson').then(r=>r.json()).then(d=>{
+            d.features.forEach(f=>{ if(f.properties.linea==1) layerFermateT1.addData(f); else if(f.properties.linea==2) layerFermateT2.addData(f); });
+            aggiornaRicerca();
+        }).catch(()=>{});
+
+        function carica(file, layer) {
+            fetch('data/'+file+'.geojson').then(r=>r.json()).then(d=>{ layer.addData(d); layer.addTo(map); aggiornaRicerca(); }).catch(()=>{});
+        }
+
+        carica('CristianeCattoliche',    layerCattolici);
+        carica('CristianeOrtodosse',     layerOrtodossi);
+        carica('EvangelicheProtestanti', layerProtestanti);
+        carica('Ebraiche',               layerEbraiche);
+        carica('Musulmane',              layerMusulmane);
+        carica('Buddhiste',              layerBuddhiste);
+        carica('AltreEsperienze',        layerAltre);
+
+        // Controlli
+        function toggle(layer, on) { if(on) map.addLayer(layer); else map.removeLayer(layer); }
+
+        document.getElementById('chk-t1').addEventListener('change', function(){ toggle(layerTracciatiBase,this.checked); toggle(layerTracciatiTacche,this.checked); });
+        document.getElementById('chk-fermate1').addEventListener('change', function(){ toggle(layerFermateT1,this.checked); });
+        document.getElementById('chk-fermate2').addEventListener('change', function(){ toggle(layerFermateT2,this.checked); });
+        document.getElementById('chk-tram').addEventListener('change', function(){
+            ['chk-t1','chk-fermate1','chk-fermate2'].forEach(id=>{ var c=document.getElementById(id); c.checked=this.checked; c.dispatchEvent(new Event('change')); });
+        });
+        document.getElementById('chk-cattolici').addEventListener('change',   function(){ toggle(layerCattolici,this.checked); });
+        document.getElementById('chk-ortodossi').addEventListener('change',   function(){ toggle(layerOrtodossi,this.checked); });
+        document.getElementById('chk-protestanti').addEventListener('change', function(){ toggle(layerProtestanti,this.checked); });
+        document.getElementById('chk-ebraiche').addEventListener('change',    function(){ toggle(layerEbraiche,this.checked); });
+        document.getElementById('chk-musulmane').addEventListener('change',   function(){ toggle(layerMusulmane,this.checked); });
+        document.getElementById('chk-buddhiste').addEventListener('change',   function(){ toggle(layerBuddhiste,this.checked); });
+        document.getElementById('chk-altre').addEventListener('change',       function(){ toggle(layerAltre,this.checked); });
+        document.getElementById('chk-culto').addEventListener('change', function(){
+            ['chk-cattolici','chk-ortodossi','chk-protestanti','chk-ebraiche','chk-musulmane','chk-buddhiste','chk-altre'].forEach(id=>{ var c=document.getElementById(id); c.checked=this.checked; c.dispatchEvent(new Event('change')); });
+        });
+
+        // Ricerca
+        var tuttiIPunti = [];
+        function aggiornaRicerca() {
+            tuttiIPunti = [];
+            [layerFermateT1,layerFermateT2].forEach((l,i)=>{ l.eachLayer(m=>{ var p=m.feature&&m.feature.properties; var n=p&&(p.nome_ferma||p.nome||''); if(n) tuttiIPunti.push({nome:n,categoria:'Fermata L'+(i+1),layer:m}); }); });
+            [[layerCattolici,'Cristiane Cattoliche'],[layerOrtodossi,'Cristiane Ortodosse'],[layerProtestanti,'Evangeliche Protestanti'],[layerEbraiche,'Ebraiche'],[layerMusulmane,'Musulmane'],[layerBuddhiste,'Buddhiste'],[layerAltre,'Altre Esperienze']].forEach(([l,cat])=>{ l.eachLayer(m=>{ var p=m.feature&&m.feature.properties; var n=p&&(p.Nome||p.nome||''); if(n) tuttiIPunti.push({nome:n,categoria:cat,layer:m}); }); });
+        }
+
+        var ricTimer;
+        document.getElementById('ricerca-input').addEventListener('input', function(){
+            clearTimeout(ricTimer);
+            var q=this.value.trim(), ris=document.getElementById('ricerca-risultati');
+            if(q.length<2){ ris.style.display='none'; return; }
+            ris.innerHTML=''; ris.style.display='block';
+            tuttiIPunti.filter(p=>p.nome.toLowerCase().includes(q.toLowerCase())).forEach(p=>{
+                var d=document.createElement('div'); d.className='risultato-item';
+                d.innerHTML=p.nome+' <span class="risultato-categoria">('+p.categoria+')</span>';
+                d.addEventListener('click',()=>{ map.setView(p.layer.getLatLng(),16); p.layer.openPopup(); ris.style.display='none'; document.getElementById('ricerca-input').value=p.nome; });
+                ris.appendChild(d);
+            });
+            ricTimer=setTimeout(()=>{
+                fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q+' Firenze')+'&format=json&limit=3').then(r=>r.json()).then(data=>{
+                    data.forEach(item=>{ var d=document.createElement('div'); d.className='risultato-item'; d.innerHTML=item.display_name.split(',').slice(0,2).join(', ')+' <span class="risultato-categoria">(indirizzo)</span>'; d.addEventListener('click',()=>{ map.setView([parseFloat(item.lat),parseFloat(item.lon)],16); ris.style.display='none'; }); ris.appendChild(d); });
+                });
+            },400);
+        });
+
+        document.addEventListener('click', e=>{ if(!document.getElementById('ricerca-container').contains(e.target)) document.getElementById('ricerca-risultati').style.display='none'; });
+
+    </script>
+</body>
+</html>
