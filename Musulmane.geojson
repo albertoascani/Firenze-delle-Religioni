@@ -1,9 +1,0 @@
-{
-"type": "FeatureCollection",
-"name": "Musulmana",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
-{ "type": "Feature", "properties": { "Categoria": "Musulmana", "Sottocategoria": "Moschea / centro islamico", "Nome": "Moschea di Firenze / Comunità Islamica di Firenze", "Indirizzo": "Via dei Martiri del Popolo 39/R, 50122, Firenze", "Latitudine": 43.771161918849458, "Longitudine": 11.264143251461684 }, "geometry": { "type": "Point", "coordinates": [ 11.264143251461684, 43.771161918849458 ] } },
-{ "type": "Feature", "properties": { "Categoria": "Musulmana", "Sottocategoria": "Moschea / centro islamico", "Nome": "Moschea di Sorgane", "Indirizzo": "Via Livenza 3, 50126, Firenze", "Latitudine": 43.752580217943844, "Longitudine": 11.305701739816234 }, "geometry": { "type": "Point", "coordinates": [ 11.305701739816234, 43.752580217943844 ] } }
-]
-}
