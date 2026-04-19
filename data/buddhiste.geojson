@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "Buddhista",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Categoria": "Buddhista", "Sottocategoria": "Zen", "Nome": "Centro Zen Firenze – Tempio Shinnyo-ji", "Indirizzo": "Via Vittorio Emanuele II 171, 50134, Firenze", "Latitude": 43.792189628281022, "Longitude": 11.251667210982211 }, "geometry": { "type": "Point", "coordinates": [ 11.251667210982211, 43.792189628281022 ] } },
+{ "type": "Feature", "properties": { "Categoria": "Buddhista", "Sottocategoria": "Buddhismo tibetano / Ewam", "Nome": "Centro Ewam", "Indirizzo": "Via Pistoiese 149/C, 50145, Firenze", "Latitude": 43.794995091212684, "Longitude": 11.197230639817951 }, "geometry": { "type": "Point", "coordinates": [ 11.197230639817951, 43.794995091212684 ] } },
+{ "type": "Feature", "properties": { "Categoria": "Buddhista", "Sottocategoria": "Soka Gakkai", "Nome": "Istituto Buddista Italiano Soka Gakkai – sede di Firenze", "Indirizzo": "Via Reginaldo Giuliani, 546, 50141, Firenze", "Latitude": 43.81812460138682, "Longitude": 11.22508401283196 }, "geometry": { "type": "Point", "coordinates": [ 11.22508401283196, 43.81812460138682 ] } },
+{ "type": "Feature", "properties": { "Categoria": "Buddhista", "Sottocategoria": "Buddhismo singalese", "Nome": "Associazione Buddhista Sri Lanka (A.B.S. Samadhi Viharaya)", "Indirizzo": "Via del Prete Carlo 10, 50127, Firenze", "Latitude": 43.794767069942495, "Longitude": 11.233598482146871 }, "geometry": { "type": "Point", "coordinates": [ 11.233598482146871, 43.794767069942495 ] } }
+]
+}
