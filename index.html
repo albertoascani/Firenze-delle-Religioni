@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="PRISMA — Portale della Diversità Religiosa a Firenze. Mappa interattiva e schede di approfondimento sulle comunità religiose presenti in città.">
+    <meta name="description" content="PRISMA — Portale della Diversità Religiosa a Firenze.">
     <title>PRISMA — Portale della Diversità Religiosa a Firenze</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -15,12 +15,11 @@
             --bg: #fafafa;
             --bg-alt: #f2f2f2;
             --text: #1a1a1a;
-            --text-muted: #888;
+            --text-muted: #999;
             --text-light: #555;
-            --border: rgba(0,0,0,0.08);
+            --border: rgba(0,0,0,0.07);
             --card-bg: #ffffff;
             --nav-bg: rgba(250,250,250,0.94);
-            --accent: #1a1a1a;
             --radius: 10px;
             --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
         }
@@ -33,12 +32,58 @@
             background: var(--bg);
             color: var(--text);
             overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* ── CURSORE PERSONALIZZATO ── */
+        #cursor {
+            position: fixed;
+            width: 10px; height: 10px;
+            background: var(--text);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%,-50%);
+            transition: width 0.2s, height 0.2s, opacity 0.2s;
+        }
+
+        #cursor-ring {
+            position: fixed;
+            width: 36px; height: 36px;
+            border: 1px solid rgba(26,26,26,0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%,-50%);
+            transition: width 0.35s ease, height 0.35s ease, border-color 0.35s ease;
+        }
+
+        body:has(a:hover) #cursor-ring,
+        body:has(button:hover) #cursor-ring {
+            width: 56px; height: 56px;
+            border-color: rgba(26,26,26,0.2);
+        }
+
+        @media (max-width: 768px) {
+            body { cursor: auto; }
+            #cursor, #cursor-ring { display: none; }
         }
 
         /* ── SCROLLBAR ── */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+        /* ── PROGRESS BAR ── */
+        #progress {
+            position: fixed;
+            top: 0; left: 0;
+            height: 2px;
+            background: var(--text);
+            z-index: 9997;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
 
         /* ── NAVBAR ── */
         nav {
@@ -52,16 +97,19 @@
             height: 64px;
             background: var(--nav-bg);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            transition: box-shadow var(--transition);
+            border-bottom: 1px solid transparent;
+            transition: border-color var(--transition), box-shadow var(--transition);
         }
 
-        nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.06); }
+        nav.scrolled {
+            border-bottom-color: var(--border);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+        }
 
         .nav-logo {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            letter-spacing: 5px;
+            letter-spacing: 6px;
             text-transform: uppercase;
             color: var(--text);
             text-decoration: none;
@@ -75,9 +123,9 @@
         }
 
         .nav-links a {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 400;
-            letter-spacing: 2px;
+            letter-spacing: 2.5px;
             text-transform: uppercase;
             color: var(--text-muted);
             text-decoration: none;
@@ -88,30 +136,27 @@
         .nav-links a::after {
             content: '';
             position: absolute;
-            bottom: -4px;
-            left: 0; right: 0;
+            bottom: -4px; left: 0; right: 0;
             height: 1px;
             background: var(--text);
             transform: scaleX(0);
             transition: transform var(--transition);
+            transform-origin: left;
         }
 
         .nav-links a:hover { color: var(--text); }
         .nav-links a:hover::after { transform: scaleX(1); }
 
-        /* Hamburger mobile */
         .nav-hamburger {
             display: none;
             flex-direction: column;
             gap: 5px;
             cursor: pointer;
-            padding: 4px;
         }
 
         .nav-hamburger span {
             display: block;
-            width: 22px;
-            height: 1.5px;
+            width: 22px; height: 1.5px;
             background: var(--text);
             transition: var(--transition);
         }
@@ -123,21 +168,17 @@
             background: var(--nav-bg);
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border);
-            padding: 20px 24px;
+            padding: 24px;
             z-index: 1999;
             flex-direction: column;
             gap: 20px;
         }
 
         .nav-mobile.open { display: flex; }
-
         .nav-mobile a {
-            font-size: 13px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--text-light);
-            text-decoration: none;
+            font-size: 12px; font-weight: 300;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: var(--text-light); text-decoration: none;
         }
 
         /* ── HERO ── */
@@ -152,23 +193,21 @@
             overflow: hidden;
         }
 
-        /* Griglia sottile di sfondo */
-        #hero::before {
-            content: '';
+        #hero-grid {
             position: absolute;
             inset: 0;
             background-image:
                 linear-gradient(var(--border) 1px, transparent 1px),
                 linear-gradient(90deg, var(--border) 1px, transparent 1px);
             background-size: 60px 60px;
-            opacity: 0.5;
+            will-change: transform;
         }
 
         .hero-content {
             position: relative;
             z-index: 1;
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(24px);
             animation: fadeUp 1.2s ease forwards 0.3s;
         }
 
@@ -186,7 +225,7 @@
         }
 
         #hero-sottotitolo {
-            font-size: clamp(10px, 1.8vw, 13px);
+            font-size: clamp(10px, 1.6vw, 13px);
             font-weight: 300;
             letter-spacing: clamp(2px, 1vw, 5px);
             text-transform: uppercase;
@@ -208,38 +247,32 @@
         }
 
         .hero-scroll span {
-            font-size: 10px;
-            font-weight: 300;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+            font-size: 9px; font-weight: 300;
+            letter-spacing: 3px; text-transform: uppercase;
             color: var(--text-muted);
         }
 
         .hero-scroll-line {
-            width: 1px;
-            height: 40px;
+            width: 1px; height: 40px;
             background: linear-gradient(to bottom, var(--text-muted), transparent);
-            animation: scrollLine 1.5s ease infinite;
+            animation: scrollLine 1.8s ease infinite;
         }
 
         @keyframes scrollLine {
-            0% { transform: scaleY(0); transform-origin: top; }
-            50% { transform: scaleY(1); transform-origin: top; }
-            51% { transform: scaleY(1); transform-origin: bottom; }
-            100% { transform: scaleY(0); transform-origin: bottom; }
+            0% { transform: scaleY(0); transform-origin: top; opacity: 1; }
+            49% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+            50% { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+            100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
         }
 
         /* ── SEZIONI ── */
         .sezione {
             opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            transform: translateY(40px);
+            transition: opacity 0.9s ease, transform 0.9s ease;
         }
 
-        .sezione.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        .sezione.visible { opacity: 1; transform: translateY(0); }
 
         .sezione-inner {
             max-width: 860px;
@@ -248,10 +281,8 @@
         }
 
         .sezione-label {
-            font-size: 10px;
-            font-weight: 500;
-            letter-spacing: 4px;
-            text-transform: uppercase;
+            font-size: 10px; font-weight: 500;
+            letter-spacing: 4px; text-transform: uppercase;
             color: var(--text-muted);
             margin-bottom: 20px;
             display: flex;
@@ -262,9 +293,9 @@
         .sezione-label::before {
             content: '';
             display: block;
-            width: 24px;
-            height: 1px;
+            width: 24px; height: 1px;
             background: var(--text-muted);
+            flex-shrink: 0;
         }
 
         .sezione-titolo {
@@ -276,30 +307,19 @@
         }
 
         .sezione-testo {
-            font-size: 15px;
-            font-weight: 300;
+            font-size: 15px; font-weight: 300;
             color: var(--text-light);
             line-height: 1.9;
             margin-bottom: 18px;
         }
 
-        /* ── INTRO ── */
-        #intro {
-            padding: 120px 0;
-        }
+        .divider { width: 100%; height: 1px; background: var(--border); }
 
-        /* ── DIVIDER ── */
-        .divider {
-            width: 100%;
-            height: 1px;
-            background: var(--border);
-        }
+        /* ── INTRO ── */
+        #intro { padding: 120px 0; }
 
         /* ── NUMERI ── */
-        #numeri {
-            padding: 100px 0;
-            background: var(--bg-alt);
-        }
+        #numeri { padding: 100px 0; background: var(--bg-alt); }
 
         .numeri-grid {
             max-width: 860px;
@@ -307,46 +327,44 @@
             padding: 0 40px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-            text-align: center;
+            gap: 16px;
         }
 
         .numero-item {
-            padding: 40px 20px;
+            padding: 48px 20px;
             border: 1px solid var(--border);
             border-radius: var(--radius);
             background: var(--card-bg);
-            transition: box-shadow var(--transition);
+            text-align: center;
+            transition: box-shadow var(--transition), transform var(--transition);
         }
 
         .numero-item:hover {
-            box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.07);
+            transform: translateY(-2px);
         }
 
         .numero-item h2 {
-            font-size: clamp(40px, 7vw, 64px);
+            font-size: clamp(44px, 7vw, 72px);
             font-weight: 200;
             color: var(--text);
             letter-spacing: 2px;
+            line-height: 1;
         }
 
         .numero-item p {
-            font-size: 10px;
-            font-weight: 400;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+            font-size: 9px; font-weight: 500;
+            letter-spacing: 3px; text-transform: uppercase;
             color: var(--text-muted);
-            margin-top: 10px;
+            margin-top: 12px;
         }
 
         /* ── COMUNITÀ ── */
-        #comunita {
-            padding: 120px 0;
-        }
+        #comunita { padding: 120px 0; }
 
         .comunita-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
             gap: 12px;
             margin-top: 48px;
         }
@@ -364,57 +382,238 @@
             overflow: hidden;
         }
 
-        .comunita-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--text);
-            opacity: 0;
-            transition: opacity var(--transition);
-        }
-
-        .comunita-card:hover::before { opacity: 0.03; }
-
         .comunita-card:hover {
-            border-color: #bbb;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
-            transform: translateY(-3px);
+            border-color: #ccc;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.07);
+            transform: translateY(-4px);
         }
 
         .comunita-emoji {
-            font-size: 30px;
+            font-size: 28px;
             margin-bottom: 14px;
-            position: relative;
+            display: block;
+            transition: transform var(--transition);
         }
 
+        .comunita-card:hover .comunita-emoji { transform: scale(1.15); }
+
         .comunita-nome {
-            font-size: 12px;
-            font-weight: 400;
-            color: var(--text-light);
-            letter-spacing: 0.5px;
-            position: relative;
+            font-size: 12px; font-weight: 400;
+            color: var(--text-light); letter-spacing: 0.3px;
         }
 
         .comunita-arrow {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 10px;
-            opacity: 0;
-            transition: opacity var(--transition);
+            font-size: 11px; color: var(--text-muted);
+            margin-top: 10px; opacity: 0;
+            transition: opacity var(--transition), transform var(--transition);
+            display: block;
+        }
+
+        .comunita-card:hover .comunita-arrow { opacity: 1; transform: translateX(4px); }
+
+        /* ── TIMELINE ── */
+        #timeline { padding: 120px 0; background: var(--bg-alt); overflow: hidden; }
+
+        .timeline-scroll {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+            padding: 48px 40px;
+            scrollbar-width: none;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .timeline-scroll::-webkit-scrollbar { display: none; }
+        .timeline-scroll.grabbing { cursor: grabbing; }
+
+        .timeline-track {
+            display: flex;
+            align-items: flex-start;
+            position: relative;
+            padding-top: 20px;
+        }
+
+        .timeline-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 260px;
+            padding: 0 32px;
             position: relative;
         }
 
-        .comunita-card:hover .comunita-arrow { opacity: 1; }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 8px; left: 0; right: 0;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .timeline-item:first-child::before { left: 50%; }
+        .timeline-item:last-child::before { right: 50%; }
+
+        .timeline-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--bg-alt);
+            border: 2px solid #bbb;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+            transition: border-color var(--transition), transform var(--transition);
+        }
+
+        .timeline-item:hover .timeline-dot {
+            border-color: var(--text);
+            transform: scale(1.3);
+        }
+
+        .timeline-anno {
+            font-size: 11px; font-weight: 500;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-top: 16px;
+            text-transform: uppercase;
+        }
+
+        .timeline-titolo {
+            font-size: 14px; font-weight: 400;
+            color: var(--text);
+            margin-top: 8px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .timeline-testo {
+            font-size: 12px; font-weight: 300;
+            color: var(--text-muted);
+            margin-top: 8px;
+            text-align: center;
+            line-height: 1.6;
+            max-width: 200px;
+        }
+
+        .timeline-hint {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        /* ── STATISTICHE ── */
+        #statistiche { padding: 120px 0; }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-top: 48px;
+            align-items: center;
+        }
+
+        .stat-bars { display: flex; flex-direction: column; gap: 16px; }
+
+        .stat-bar-item { display: flex; flex-direction: column; gap: 6px; }
+
+        .stat-bar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-bar-label {
+            font-size: 12px; font-weight: 400;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-bar-value {
+            font-size: 11px; font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .stat-bar-track {
+            height: 3px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: var(--text);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .stat-donut-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-donut {
+            width: 180px; height: 180px;
+            position: relative;
+        }
+
+        .stat-donut svg { transform: rotate(-90deg); }
+
+        .stat-donut-label {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px; font-weight: 200;
+            color: var(--text);
+        }
+
+        .stat-donut-label span {
+            font-size: 10px; font-weight: 400;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .stat-legenda {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .stat-legenda-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            font-weight: 300;
+            color: var(--text-light);
+        }
+
+        .stat-legenda-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
 
         /* ── MAPPA ── */
-        #sezione-mappa {
-            padding: 120px 0 0;
-        }
+        #sezione-mappa { padding: 120px 0 0; }
 
         #map-container {
             position: relative;
-            width: 100%;
-            height: 75vh;
+            width: 100%; height: 75vh;
             min-height: 500px;
             margin-top: 48px;
             border-top: 1px solid var(--border);
@@ -422,15 +621,13 @@
 
         #map { width: 100%; height: 100%; }
 
-        /* Indice */
         #indice {
             position: absolute;
-            bottom: 24px;
-            left: 16px;
+            bottom: 24px; left: 16px;
             z-index: 1000;
             background: rgba(250,250,250,0.97);
             border-radius: var(--radius);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             font-family: 'Inter', sans-serif;
             font-size: 13px;
             color: var(--text);
@@ -442,88 +639,62 @@
         }
 
         #indice h3 {
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 3px;
-            text-transform: uppercase;
+            font-size: 9px; font-weight: 600;
+            letter-spacing: 3px; text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 12px;
-            padding-bottom: 10px;
+            margin-bottom: 12px; padding-bottom: 10px;
             border-bottom: 1px solid var(--border);
         }
 
         #ricerca-container { position: relative; margin-bottom: 12px; }
 
         #ricerca-input {
-            width: 100%;
-            padding: 7px 10px;
+            width: 100%; padding: 7px 10px;
             font-family: 'Inter', sans-serif;
-            font-size: 11px;
-            font-weight: 300;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background: white;
-            box-sizing: border-box;
-            color: var(--text);
-            transition: border-color var(--transition);
+            font-size: 11px; font-weight: 300;
+            border: 1px solid #e0e0e0; border-radius: 6px;
+            background: white; box-sizing: border-box;
+            color: var(--text); transition: border-color var(--transition);
         }
 
-        #ricerca-input:focus {
-            outline: none;
-            border-color: #aaa;
-        }
+        #ricerca-input:focus { outline: none; border-color: #aaa; }
 
         #ricerca-risultati {
             position: absolute;
-            top: calc(100% + 4px);
-            left: 0; right: 0;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            max-height: 180px;
-            overflow-y: auto;
-            z-index: 2000;
+            top: calc(100% + 4px); left: 0; right: 0;
+            background: white; border: 1px solid #e0e0e0;
+            border-radius: 6px; max-height: 180px;
+            overflow-y: auto; z-index: 2000;
             display: none;
             box-shadow: 0 8px 24px rgba(0,0,0,0.08);
         }
 
         .risultato-item {
-            padding: 8px 10px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 400;
+            padding: 8px 10px; cursor: pointer;
+            font-size: 11px; font-weight: 400;
             border-bottom: 1px solid #f5f5f5;
             color: var(--text);
             transition: background var(--transition);
         }
 
         .risultato-item:hover { background: #f8f8f8; }
-        .risultato-categoria { font-size: 9px; color: #bbb; margin-left: 4px; }
+        .risultato-categoria { font-size: 9px; color: #ccc; margin-left: 4px; }
 
         .indice-gruppo { margin-bottom: 10px; }
 
         .indice-gruppo-titolo {
-            font-weight: 500;
-            font-size: 10px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #666;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-weight: 500; font-size: 9px;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: #777; margin-bottom: 6px;
+            display: flex; align-items: center; gap: 6px;
             cursor: pointer;
         }
 
         .indice-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 3px 0 3px 10px;
-            font-size: 12px;
-            font-weight: 300;
-            cursor: pointer;
-            color: #444;
+            display: flex; align-items: center;
+            gap: 8px; margin: 3px 0 3px 10px;
+            font-size: 12px; font-weight: 300;
+            cursor: pointer; color: #444;
         }
 
         .indice-item input, .indice-gruppo-titolo input {
@@ -535,7 +706,7 @@
         /* ── POPUP ── */
         .leaflet-popup-content-wrapper {
             border-radius: 8px !important;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.12) !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important;
             border: 1px solid var(--border) !important;
         }
 
@@ -555,111 +726,86 @@
 
         /* ── FOOTER ── */
         footer {
-            background: var(--text);
-            color: #666;
+            background: var(--text); color: #555;
             padding: 60px 48px;
-            margin-top: 0;
         }
 
         .footer-inner {
-            max-width: 860px;
-            margin: 0 auto;
+            max-width: 860px; margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: start;
+            gap: 40px; align-items: start;
         }
 
         .footer-brand {
-            font-size: 14px;
-            font-weight: 300;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            color: #999;
-            margin-bottom: 12px;
+            font-size: 13px; font-weight: 300;
+            letter-spacing: 6px; text-transform: uppercase;
+            color: #888; margin-bottom: 12px;
         }
 
         .footer-desc {
-            font-size: 12px;
-            font-weight: 300;
-            color: #555;
-            line-height: 1.7;
+            font-size: 12px; font-weight: 300;
+            color: #444; line-height: 1.8;
         }
 
         .footer-links {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            text-align: right;
+            display: flex; flex-direction: column;
+            gap: 10px; text-align: right;
         }
 
         .footer-links a {
-            font-size: 11px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #555;
-            text-decoration: none;
+            font-size: 10px; font-weight: 300;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: #444; text-decoration: none;
             transition: color var(--transition);
         }
 
-        .footer-links a:hover { color: #999; }
+        .footer-links a:hover { color: #888; }
 
         .footer-bottom {
-            max-width: 860px;
-            margin: 40px auto 0;
+            max-width: 860px; margin: 40px auto 0;
             padding-top: 24px;
-            border-top: 1px solid #333;
+            border-top: 1px solid #2a2a2a;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .footer-bottom p {
-            font-size: 10px;
-            font-weight: 300;
-            letter-spacing: 1px;
-            color: #444;
-        }
+        .footer-bottom p { font-size: 10px; font-weight: 300; color: #333; letter-spacing: 1px; }
 
         /* ── MOBILE ── */
         @media (max-width: 768px) {
             nav { padding: 0 20px; }
             .nav-links { display: none; }
             .nav-hamburger { display: flex; }
-
-            #hero-titolo { letter-spacing: clamp(6px, 3vw, 16px); }
-
             .sezione-inner { padding: 0 20px; }
-            #intro, #comunita, #sezione-mappa { padding: 80px 0 0; }
-            #numeri { padding: 80px 0; }
-
-            .numeri-grid { grid-template-columns: repeat(3,1fr); gap: 12px; padding: 0 20px; }
-            .numero-item { padding: 24px 12px; }
-
-            .footer-inner { grid-template-columns: 1fr; gap: 24px; }
+            #intro, #comunita, #sezione-mappa, #statistiche { padding: 80px 0 0; }
+            #timeline, #numeri { padding: 80px 0; }
+            .numeri-grid { padding: 0 20px; gap: 10px; grid-template-columns: repeat(3,1fr); }
+            .numero-item { padding: 28px 10px; }
+            .stat-grid { grid-template-columns: 1fr; gap: 40px; }
+            .timeline-scroll { padding: 40px 20px; }
+            .footer-inner { grid-template-columns: 1fr; }
             .footer-links { text-align: left; }
             .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
             footer { padding: 40px 20px; }
-
-            #indice {
-                bottom: 10px; left: 10px;
-                width: 200px; font-size: 11px;
-                padding: 8px 12px; max-height: 35vh;
-            }
-
-            .leaflet-top.leaflet-left {
-                top: auto !important; bottom: 100px !important;
-                left: auto !important; right: 10px !important;
-            }
+            #indice { bottom:10px; left:10px; width:200px; font-size:11px; padding:8px 12px; max-height:35vh; }
+            .leaflet-top.leaflet-left { top:auto!important; bottom:100px!important; left:auto!important; right:10px!important; }
         }
 
         @media (max-width: 480px) {
-            .numeri-grid { grid-template-columns: 1fr; max-width: 240px; margin: 0 auto; }
+            .numeri-grid { grid-template-columns: 1fr; max-width: 220px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- Cursore -->
+    <div id="cursor"></div>
+    <div id="cursor-ring"></div>
+
+    <!-- Progress bar -->
+    <div id="progress"></div>
 
     <!-- Navbar -->
     <nav id="navbar">
@@ -667,8 +813,9 @@
         <ul class="nav-links">
             <li><a href="#intro">Il Progetto</a></li>
             <li><a href="#comunita">Comunità</a></li>
+            <li><a href="#timeline">Storia</a></li>
+            <li><a href="#statistiche">Dati</a></li>
             <li><a href="#sezione-mappa">Mappa</a></li>
-            <li><a href="comunita/about.html">Chi siamo</a></li>
         </ul>
         <div class="nav-hamburger" id="hamburger" onclick="toggleMenu()">
             <span></span><span></span><span></span>
@@ -679,12 +826,14 @@
     <div class="nav-mobile" id="nav-mobile">
         <a href="#intro" onclick="toggleMenu()">Il Progetto</a>
         <a href="#comunita" onclick="toggleMenu()">Comunità</a>
+        <a href="#timeline" onclick="toggleMenu()">Storia</a>
+        <a href="#statistiche" onclick="toggleMenu()">Dati</a>
         <a href="#sezione-mappa" onclick="toggleMenu()">Mappa</a>
-        <a href="comunita/about.html" onclick="toggleMenu()">Chi siamo</a>
     </div>
 
     <!-- Hero -->
     <section id="hero">
+        <div id="hero-grid"></div>
         <div class="hero-content">
             <div id="hero-titolo">PRISMA</div>
             <div id="hero-sottotitolo">Portale della Diversità Religiosa a Firenze</div>
@@ -713,15 +862,15 @@
     <section id="numeri" class="sezione">
         <div class="numeri-grid">
             <div class="numero-item">
-                <h2>7</h2>
+                <h2 class="counter" data-target="7">0</h2>
                 <p>Comunità mappate</p>
             </div>
             <div class="numero-item">
-                <h2>40+</h2>
+                <h2 class="counter" data-target="40" data-suffix="+">0</h2>
                 <p>Luoghi di culto</p>
             </div>
             <div class="numero-item">
-                <h2>1</h2>
+                <h2 class="counter" data-target="1">0</h2>
                 <p>Città</p>
             </div>
         </div>
@@ -736,41 +885,195 @@
             <h2 class="sezione-titolo">Le comunità religiose</h2>
             <div class="comunita-grid">
                 <a href="comunita/cattolici.html" class="comunita-card">
-                    <div class="comunita-emoji">✝️</div>
+                    <span class="comunita-emoji">✝️</span>
                     <div class="comunita-nome">Cristiane Cattoliche</div>
-                    <div class="comunita-arrow">→</div>
+                    <span class="comunita-arrow">→</span>
                 </a>
                 <a href="comunita/ortodossi.html" class="comunita-card">
-                    <div class="comunita-emoji">☦️</div>
+                    <span class="comunita-emoji">☦️</span>
                     <div class="comunita-nome">Cristiane Ortodosse</div>
-                    <div class="comunita-arrow">→</div>
+                    <span class="comunita-arrow">→</span>
                 </a>
                 <a href="comunita/protestanti.html" class="comunita-card">
-                    <div class="comunita-emoji">🛐</div>
+                    <span class="comunita-emoji">🛐</span>
                     <div class="comunita-nome">Evangeliche Protestanti</div>
-                    <div class="comunita-arrow">→</div>
+                    <span class="comunita-arrow">→</span>
                 </a>
                 <a href="comunita/ebraiche.html" class="comunita-card">
-                    <div class="comunita-emoji">✡️</div>
+                    <span class="comunita-emoji">✡️</span>
                     <div class="comunita-nome">Ebraiche</div>
-                    <div class="comunita-arrow">→</div>
+                    <span class="comunita-arrow">→</span>
                 </a>
                 <a href="comunita/musulmane.html" class="comunita-card">
-                    <div class="comunita-emoji">☪️</div>
+                    <span class="comunita-emoji">☪️</span>
                     <div class="comunita-nome">Musulmane</div>
-                    <div class="comunita-arrow">→</div>
+                    <span class="comunita-arrow">→</span>
                 </a>
                 <a href="comunita/buddhiste.html" class="comunita-card">
-                    <div class="comunita-emoji">☸️</div>
+                    <span class="comunita-emoji">☸️</span>
                     <div class="comunita-nome">Buddhiste</div>
-                    <div class="comunita-arrow">→</div>
+                    <span class="comunita-arrow">→</span>
                 </a>
                 <a href="comunita/altre.html" class="comunita-card">
-                    <div class="comunita-emoji">🟪</div>
+                    <span class="comunita-emoji">🟪</span>
                     <div class="comunita-nome">Altre Esperienze</div>
-                    <div class="comunita-arrow">→</div>
+                    <span class="comunita-arrow">→</span>
                 </a>
             </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Timeline -->
+    <section id="timeline" class="sezione">
+        <div class="sezione-inner">
+            <div class="sezione-label">Storia</div>
+            <h2 class="sezione-titolo">La diversità religiosa a Firenze nel tempo</h2>
+            <p class="timeline-hint">← trascina per esplorare →</p>
+        </div>
+        <div class="timeline-scroll" id="timeline-scroll">
+            <div class="timeline-track">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-anno">XI secolo</div>
+                    <div class="timeline-titolo">La comunità ebraica</div>
+                    <div class="timeline-testo">Presenza ebraica documentata a Firenze fin dall'XI secolo, con una comunità attiva nel commercio e nelle attività finanziarie.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-anno">1439</div>
+                    <div class="timeline-titolo">Concilio di Firenze</div>
+                    <div class="timeline-testo">Firenze ospita il Concilio che tenta la riunificazione tra Chiesa d'Occidente e d'Oriente, segnando un momento storico di dialogo cristiano.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-anno">1571</div>
+                    <div class="timeline-titolo">Il Ghetto fiorentino</div>
+                    <div class="timeline-testo">Cosimo I istituisce il ghetto ebraico in via delle Oche. La comunità ebraica viene confinata ma mantiene una vita culturale e religiosa vivace.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-anno">1848</div>
+                    <div class="timeline-titolo">Emancipazione</div>
+                    <div class="timeline-testo">Il Granducato di Toscana concede piena emancipazione agli ebrei. Il ghetto viene abbattuto e la comunità si integra nella vita cittadina.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-anno">XIX secolo</div>
+                    <div class="timeline-titolo">Chiese protestanti</div>
+                    <div class="timeline-testo">L'arrivo di comunità anglicane, valdesi e riformate al seguito di residenti stranieri arricchisce il panorama religioso fiorentino.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-anno">Novecento</div>
+                    <div class="timeline-titolo">Nuove migrazioni</div>
+                    <div class="timeline-testo">Le migrazioni del XX secolo portano a Firenze nuove comunità ortodosse, musulmane e buddhiste, trasformando la geografia religiosa della città.</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-anno">Oggi</div>
+                    <div class="timeline-titolo">Una città plurale</div>
+                    <div class="timeline-testo">Firenze ospita oggi oltre 40 luoghi di culto appartenenti a 7 tradizioni religiose diverse, in un tessuto urbano sempre più plurale.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Statistiche -->
+    <section id="statistiche" class="sezione">
+        <div class="sezione-inner">
+            <div class="sezione-label">Dati</div>
+            <h2 class="sezione-titolo">La pluralità religiosa in numeri</h2>
+            <div class="stat-grid">
+                <div class="stat-bars">
+                    <div class="stat-bar-item">
+                        <div class="stat-bar-header">
+                            <span class="stat-bar-label"><span>✝️</span> Cristiane Cattoliche</span>
+                            <span class="stat-bar-value">~45%</span>
+                        </div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" data-width="45"></div></div>
+                    </div>
+                    <div class="stat-bar-item">
+                        <div class="stat-bar-header">
+                            <span class="stat-bar-label"><span>☪️</span> Musulmane</span>
+                            <span class="stat-bar-value">~20%</span>
+                        </div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" data-width="20"></div></div>
+                    </div>
+                    <div class="stat-bar-item">
+                        <div class="stat-bar-header">
+                            <span class="stat-bar-label"><span>☦️</span> Cristiane Ortodosse</span>
+                            <span class="stat-bar-value">~15%</span>
+                        </div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" data-width="15"></div></div>
+                    </div>
+                    <div class="stat-bar-item">
+                        <div class="stat-bar-header">
+                            <span class="stat-bar-label"><span>🛐</span> Evangeliche Protestanti</span>
+                            <span class="stat-bar-value">~10%</span>
+                        </div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" data-width="10"></div></div>
+                    </div>
+                    <div class="stat-bar-item">
+                        <div class="stat-bar-header">
+                            <span class="stat-bar-label"><span>☸️</span> Buddhiste</span>
+                            <span class="stat-bar-value">~5%</span>
+                        </div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" data-width="5"></div></div>
+                    </div>
+                    <div class="stat-bar-item">
+                        <div class="stat-bar-header">
+                            <span class="stat-bar-label"><span>✡️</span> Ebraiche</span>
+                            <span class="stat-bar-value">~3%</span>
+                        </div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" data-width="3"></div></div>
+                    </div>
+                    <div class="stat-bar-item">
+                        <div class="stat-bar-header">
+                            <span class="stat-bar-label"><span>🟪</span> Altre Esperienze</span>
+                            <span class="stat-bar-value">~2%</span>
+                        </div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill" data-width="2"></div></div>
+                    </div>
+                </div>
+
+                <div class="stat-donut-wrap">
+                    <div class="stat-donut">
+                        <svg width="180" height="180" viewBox="0 0 180 180">
+                            <circle cx="90" cy="90" r="70" fill="none" stroke="#f0f0f0" stroke-width="16"/>
+                            <!-- Cristiane Cattoliche 45% -->
+                            <circle cx="90" cy="90" r="70" fill="none" stroke="#1a1a1a" stroke-width="16"
+                                stroke-dasharray="0 440" stroke-dashoffset="0" class="donut-segment" data-pct="45" data-offset="0"/>
+                            <!-- Musulmane 20% -->
+                            <circle cx="90" cy="90" r="70" fill="none" stroke="#555" stroke-width="16"
+                                stroke-dasharray="0 440" stroke-dashoffset="0" class="donut-segment" data-pct="20" data-offset="45"/>
+                            <!-- Ortodosse 15% -->
+                            <circle cx="90" cy="90" r="70" fill="none" stroke="#888" stroke-width="16"
+                                stroke-dasharray="0 440" stroke-dashoffset="0" class="donut-segment" data-pct="15" data-offset="65"/>
+                            <!-- Protestanti 10% -->
+                            <circle cx="90" cy="90" r="70" fill="none" stroke="#aaa" stroke-width="16"
+                                stroke-dasharray="0 440" stroke-dashoffset="0" class="donut-segment" data-pct="10" data-offset="80"/>
+                            <!-- Altre 10% -->
+                            <circle cx="90" cy="90" r="70" fill="none" stroke="#ccc" stroke-width="16"
+                                stroke-dasharray="0 440" stroke-dashoffset="0" class="donut-segment" data-pct="10" data-offset="90"/>
+                        </svg>
+                        <div class="stat-donut-label">
+                            7<span>comunità</span>
+                        </div>
+                    </div>
+                    <div class="stat-legenda">
+                        <div class="stat-legenda-item"><div class="stat-legenda-dot" style="background:#1a1a1a"></div>Cristiane Cattoliche</div>
+                        <div class="stat-legenda-item"><div class="stat-legenda-dot" style="background:#555"></div>Musulmane</div>
+                        <div class="stat-legenda-item"><div class="stat-legenda-dot" style="background:#888"></div>Cristiane Ortodosse</div>
+                        <div class="stat-legenda-item"><div class="stat-legenda-dot" style="background:#aaa"></div>Evangeliche Protestanti</div>
+                        <div class="stat-legenda-item"><div class="stat-legenda-dot" style="background:#ccc"></div>Altre</div>
+                    </div>
+                </div>
+            </div>
+            <p style="font-size:10px;color:var(--text-muted);margin-top:32px;letter-spacing:1px;">* Dati indicativi basati sul numero di luoghi di culto censiti. Fonte: rilevamento PRISMA 2025.</p>
         </div>
     </section>
 
@@ -791,9 +1094,7 @@
                     <div id="ricerca-risultati"></div>
                 </div>
                 <div class="indice-gruppo">
-                    <div class="indice-gruppo-titolo">
-                        <input type="checkbox" id="chk-tram"> Tram
-                    </div>
+                    <div class="indice-gruppo-titolo"><input type="checkbox" id="chk-tram"> Tram</div>
                     <div class="indice-item">
                         <input type="checkbox" id="chk-t1">
                         <span style="display:inline-block;width:26px;height:7px;background:repeating-linear-gradient(90deg,transparent 0,transparent 4px,#888 4px,#888 5px);border-top:2px solid #999;border-bottom:2px solid #999;flex-shrink:0;"></span>
@@ -811,9 +1112,7 @@
                     </div>
                 </div>
                 <div class="indice-gruppo">
-                    <div class="indice-gruppo-titolo">
-                        <input type="checkbox" id="chk-culto" checked> Comunità Religiose
-                    </div>
+                    <div class="indice-gruppo-titolo"><input type="checkbox" id="chk-culto" checked> Comunità Religiose</div>
                     <div class="indice-item"><input type="checkbox" id="chk-cattolici" checked><span>✝️</span> Cristiane Cattoliche</div>
                     <div class="indice-item"><input type="checkbox" id="chk-ortodossi" checked><span>☦️</span> Cristiane Ortodosse</div>
                     <div class="indice-item"><input type="checkbox" id="chk-protestanti" checked><span>🛐</span> Evangeliche Protestanti</div>
@@ -836,8 +1135,9 @@
             <div class="footer-links">
                 <a href="#intro">Il Progetto</a>
                 <a href="#comunita">Comunità</a>
+                <a href="#timeline">Storia</a>
+                <a href="#statistiche">Dati</a>
                 <a href="#sezione-mappa">Mappa</a>
-                <a href="comunita/about.html">Chi siamo</a>
             </div>
         </div>
         <div class="footer-bottom">
@@ -849,62 +1149,142 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
+        // ── CURSORE ──
+        var cursor = document.getElementById('cursor');
+        var cursorRing = document.getElementById('cursor-ring');
+        var cx = 0, cy = 0, rx = 0, ry = 0;
 
-        // ── Navbar scroll ──
+        document.addEventListener('mousemove', function(e) {
+            cx = e.clientX; cy = e.clientY;
+            cursor.style.left = cx + 'px';
+            cursor.style.top = cy + 'px';
+        });
+
+        (function animCursor() {
+            rx += (cx - rx) * 0.12;
+            ry += (cy - ry) * 0.12;
+            cursorRing.style.left = rx + 'px';
+            cursorRing.style.top = ry + 'px';
+            requestAnimationFrame(animCursor);
+        })();
+
+        // ── PROGRESS BAR ──
         window.addEventListener('scroll', function() {
+            var pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+            document.getElementById('progress').style.width = pct + '%';
             document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
         });
 
-        // ── Hamburger menu ──
+        // ── HAMBURGER ──
         function toggleMenu() {
             document.getElementById('nav-mobile').classList.toggle('open');
         }
 
-        // ── Scroll animations ──
+        // ── PARALLAX HERO GRID ──
+        window.addEventListener('scroll', function() {
+            var s = window.scrollY;
+            document.getElementById('hero-grid').style.transform = 'translateY(' + s * 0.3 + 'px)';
+        }, { passive: true });
+
+        // ── SCROLL ANIMATIONS ──
         var observer = new IntersectionObserver(function(entries) {
             entries.forEach(function(e) {
-                if (e.isIntersecting) { e.target.classList.add('visible'); }
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    // Avvia contatori
+                    e.target.querySelectorAll('.counter').forEach(startCounter);
+                    // Avvia barre statistiche
+                    e.target.querySelectorAll('.stat-bar-fill').forEach(function(bar) {
+                        setTimeout(function() { bar.style.width = bar.dataset.width + '%'; }, 200);
+                    });
+                    // Avvia donut
+                    e.target.querySelectorAll('.donut-segment').forEach(animateDonut);
+                }
             });
-        }, { threshold: 0.1 });
+        }, { threshold: 0.15 });
 
         document.querySelectorAll('.sezione').forEach(function(el) { observer.observe(el); });
 
-        // ── Mappa ──
-        var map = L.map('map', { center: [43.7696, 11.2558], zoom: 13, zoomControl: true });
+        // ── CONTATORI ANIMATI ──
+        function startCounter(el) {
+            if (el.dataset.done) return;
+            el.dataset.done = true;
+            var target = parseInt(el.dataset.target);
+            var suffix = el.dataset.suffix || '';
+            var duration = 1200;
+            var start = performance.now();
+            function update(now) {
+                var t = Math.min((now - start) / duration, 1);
+                var ease = 1 - Math.pow(1 - t, 3);
+                el.textContent = Math.round(ease * target) + suffix;
+                if (t < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        // ── DONUT ANIMATO ──
+        function animateDonut(seg) {
+            if (seg.dataset.done) return;
+            seg.dataset.done = true;
+            var circ = 2 * Math.PI * 70;
+            var pct = parseFloat(seg.dataset.pct) / 100;
+            var offset = parseFloat(seg.dataset.offset) / 100;
+            var dash = circ * pct;
+            var gap = circ - dash;
+            var dashOffset = -(circ * offset);
+            setTimeout(function() {
+                seg.style.transition = 'stroke-dasharray 1s cubic-bezier(0.4,0,0.2,1)';
+                seg.style.strokeDasharray = dash + ' ' + gap;
+                seg.style.strokeDashoffset = dashOffset;
+            }, 300);
+        }
+
+        // ── TIMELINE DRAG ──
+        var tl = document.getElementById('timeline-scroll');
+        var isDragging = false, startX, scrollLeft;
+
+        tl.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            startX = e.pageX - tl.offsetLeft;
+            scrollLeft = tl.scrollLeft;
+            tl.classList.add('grabbing');
+        });
+
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
+            tl.classList.remove('grabbing');
+        });
+
+        tl.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            var x = e.pageX - tl.offsetLeft;
+            tl.scrollLeft = scrollLeft - (x - startX);
+        });
+
+        // ── MAPPA ──
+        var map = L.map('map', { center: [43.7696, 11.2558], zoom: 13 });
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 19
         }).addTo(map);
 
-        // Fix zoom quando si scrolla alla mappa
         document.getElementById('map').addEventListener('wheel', function(e) { e.stopPropagation(); });
 
-        // Icone tram
         var iconaT1 = L.divIcon({ html:'<div style="background:#2196F3;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;font-family:Inter,sans-serif;box-shadow:0 2px 6px rgba(33,150,243,0.4);">1</div>', iconSize:[20,20], iconAnchor:[10,10], popupAnchor:[0,-10], className:'' });
         var iconaT2 = L.divIcon({ html:'<div style="background:#e63946;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;font-family:Inter,sans-serif;box-shadow:0 2px 6px rgba(230,57,70,0.4);">2</div>', iconSize:[20,20], iconAnchor:[10,10], popupAnchor:[0,-10], className:'' });
 
-        // Tracciati
         var layerTracciatiBase = L.geoJSON(null, { style:{ color:'#bbb', weight:2, opacity:1, lineCap:'round', lineJoin:'round' } });
         var layerTracciatiTacche = L.geoJSON(null, { style:{ color:'#aaa', weight:5, opacity:0.5, dashArray:'1 10', lineCap:'square' } });
 
-        // Fermate
         function popupTram(p, linea) {
             return '<div class="popup-titolo">'+(p.nome_ferma||p.nome||'Fermata')+'</div><div class="popup-riga"><span class="popup-label">Linea</span> '+linea+'</div>';
         }
 
-        var layerFermateT1 = L.geoJSON(null, {
-            pointToLayer: function(f,ll){ return L.marker(ll,{icon:iconaT1}); },
-            onEachFeature: function(f,l){ l.bindPopup(popupTram(f.properties,'1')); }
-        });
-        var layerFermateT2 = L.geoJSON(null, {
-            pointToLayer: function(f,ll){ return L.marker(ll,{icon:iconaT2}); },
-            onEachFeature: function(f,l){ l.bindPopup(popupTram(f.properties,'2')); }
-        });
+        var layerFermateT1 = L.geoJSON(null, { pointToLayer:function(f,ll){ return L.marker(ll,{icon:iconaT1}); }, onEachFeature:function(f,l){ l.bindPopup(popupTram(f.properties,'1')); } });
+        var layerFermateT2 = L.geoJSON(null, { pointToLayer:function(f,ll){ return L.marker(ll,{icon:iconaT2}); }, onEachFeature:function(f,l){ l.bindPopup(popupTram(f.properties,'2')); } });
 
-        // Icone comunità
-        function icona(e) {
-            return L.divIcon({ html:'<div style="font-size:22px;line-height:28px;text-align:center;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.25));">'+e+'</div>', iconSize:[28,28], iconAnchor:[14,14], popupAnchor:[0,-14], className:'' });
-        }
+        function icona(e) { return L.divIcon({ html:'<div style="font-size:22px;line-height:28px;text-align:center;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.25));">'+e+'</div>', iconSize:[28,28], iconAnchor:[14,14], popupAnchor:[0,-14], className:'' }); }
 
         function popup(p) {
             var h='<div class="popup-titolo">'+(p.Nome||p.nome||'')+'</div>';
@@ -913,70 +1293,46 @@
             return h;
         }
 
-        function layer(emoji) {
-            return L.geoJSON(null, {
-                pointToLayer: function(f,ll){ return L.marker(ll,{icon:icona(emoji)}); },
-                onEachFeature: function(f,l){ l.bindPopup(popup(f.properties)); }
-            });
-        }
+        function mkLayer(emoji) { return L.geoJSON(null, { pointToLayer:function(f,ll){ return L.marker(ll,{icon:icona(emoji)}); }, onEachFeature:function(f,l){ l.bindPopup(popup(f.properties)); } }); }
 
-        var layerCattolici   = layer('✝️');
-        var layerOrtodossi   = layer('☦️');
-        var layerProtestanti = layer('🛐');
-        var layerEbraiche    = layer('✡️');
-        var layerMusulmane   = layer('☪️');
-        var layerBuddhiste   = layer('☸️');
-        var layerAltre       = layer('🟪');
+        var layerCattolici   = mkLayer('✝️');
+        var layerOrtodossi   = mkLayer('☦️');
+        var layerProtestanti = mkLayer('🛐');
+        var layerEbraiche    = mkLayer('✡️');
+        var layerMusulmane   = mkLayer('☪️');
+        var layerBuddhiste   = mkLayer('☸️');
+        var layerAltre       = mkLayer('🟪');
 
-        // Carica dati
-        fetch('data/tracciatitram.geojson').then(r=>r.json()).then(d=>{
-            d.features.forEach(f=>{ if(f.properties.linea===null) return; layerTracciatiBase.addData(f); layerTracciatiTacche.addData(f); });
-        }).catch(()=>{});
+        fetch('data/tracciatitram.geojson').then(r=>r.json()).then(d=>{ d.features.forEach(f=>{ if(f.properties.linea===null) return; layerTracciatiBase.addData(f); layerTracciatiTacche.addData(f); }); }).catch(()=>{});
+        fetch('data/fermatetram.geojson').then(r=>r.json()).then(d=>{ d.features.forEach(f=>{ if(f.properties.linea==1) layerFermateT1.addData(f); else if(f.properties.linea==2) layerFermateT2.addData(f); }); aggiornaRicerca(); }).catch(()=>{});
 
-        fetch('data/fermatetram.geojson').then(r=>r.json()).then(d=>{
-            d.features.forEach(f=>{ if(f.properties.linea==1) layerFermateT1.addData(f); else if(f.properties.linea==2) layerFermateT2.addData(f); });
-            aggiornaRicerca();
-        }).catch(()=>{});
+        function carica(file, lyr) { fetch('data/'+file+'.geojson').then(r=>r.json()).then(d=>{ lyr.addData(d); lyr.addTo(map); aggiornaRicerca(); }).catch(()=>{}); }
 
-        function carica(file, lyr) {
-            fetch('data/'+file+'.geojson').then(r=>r.json()).then(d=>{ lyr.addData(d); lyr.addTo(map); aggiornaRicerca(); }).catch(()=>{});
-        }
-
-        carica('cristianecattoliche',    layerCattolici);
-        carica('cristianeortodosse',     layerOrtodossi);
+        carica('cristianecattoliche', layerCattolici);
+        carica('cristianeortodosse', layerOrtodossi);
         carica('evangelicheprotestanti', layerProtestanti);
-        carica('ebraiche',               layerEbraiche);
-        carica('musulmane',              layerMusulmane);
-        carica('buddhiste',              layerBuddhiste);
-        carica('altreesperienze',        layerAltre);
+        carica('ebraiche', layerEbraiche);
+        carica('musulmane', layerMusulmane);
+        carica('buddhiste', layerBuddhiste);
+        carica('altreesperienze', layerAltre);
 
-        // Controlli
         function toggle(lyr, on) { if(on) map.addLayer(lyr); else map.removeLayer(lyr); }
 
         document.getElementById('chk-t1').addEventListener('change', function(){ toggle(layerTracciatiBase,this.checked); toggle(layerTracciatiTacche,this.checked); });
         document.getElementById('chk-fermate1').addEventListener('change', function(){ toggle(layerFermateT1,this.checked); });
         document.getElementById('chk-fermate2').addEventListener('change', function(){ toggle(layerFermateT2,this.checked); });
-        document.getElementById('chk-tram').addEventListener('change', function(){
-            ['chk-t1','chk-fermate1','chk-fermate2'].forEach(id=>{ var c=document.getElementById(id); c.checked=this.checked; c.dispatchEvent(new Event('change')); });
-        });
-        ['cattolici','ortodossi','protestanti','ebraiche','musulmane','buddhiste','altre'].forEach(function(id, i) {
-            var layers = [layerCattolici,layerOrtodossi,layerProtestanti,layerEbraiche,layerMusulmane,layerBuddhiste,layerAltre];
-            document.getElementById('chk-'+id).addEventListener('change', function(){ toggle(layers[i],this.checked); });
-        });
-        document.getElementById('chk-culto').addEventListener('change', function(){
-            ['cattolici','ortodossi','protestanti','ebraiche','musulmane','buddhiste','altre'].forEach(id=>{ var c=document.getElementById('chk-'+id); c.checked=this.checked; c.dispatchEvent(new Event('change')); });
-        });
+        document.getElementById('chk-tram').addEventListener('change', function(){ ['chk-t1','chk-fermate1','chk-fermate2'].forEach(id=>{ var c=document.getElementById(id); c.checked=this.checked; c.dispatchEvent(new Event('change')); }); });
 
-        // Ricerca
+        var cultIds = ['cattolici','ortodossi','protestanti','ebraiche','musulmane','buddhiste','altre'];
+        var cultLayers = [layerCattolici,layerOrtodossi,layerProtestanti,layerEbraiche,layerMusulmane,layerBuddhiste,layerAltre];
+        cultIds.forEach(function(id, i){ document.getElementById('chk-'+id).addEventListener('change', function(){ toggle(cultLayers[i],this.checked); }); });
+        document.getElementById('chk-culto').addEventListener('change', function(){ cultIds.forEach(id=>{ var c=document.getElementById('chk-'+id); c.checked=this.checked; c.dispatchEvent(new Event('change')); }); });
+
         var tuttiIPunti = [];
         function aggiornaRicerca() {
             tuttiIPunti = [];
-            [[layerFermateT1,'Fermata L1'],[layerFermateT2,'Fermata L2']].forEach(([l,cat])=>{
-                l.eachLayer(m=>{ var p=m.feature&&m.feature.properties; var n=p&&(p.nome_ferma||p.nome||''); if(n) tuttiIPunti.push({nome:n,categoria:cat,layer:m}); });
-            });
-            [[layerCattolici,'Cristiane Cattoliche'],[layerOrtodossi,'Cristiane Ortodosse'],[layerProtestanti,'Evangeliche Protestanti'],[layerEbraiche,'Ebraiche'],[layerMusulmane,'Musulmane'],[layerBuddhiste,'Buddhiste'],[layerAltre,'Altre Esperienze']].forEach(([l,cat])=>{
-                l.eachLayer(m=>{ var p=m.feature&&m.feature.properties; var n=p&&(p.Nome||p.nome||''); if(n) tuttiIPunti.push({nome:n,categoria:cat,layer:m}); });
-            });
+            [[layerFermateT1,'Fermata L1'],[layerFermateT2,'Fermata L2']].forEach(([l,cat])=>{ l.eachLayer(m=>{ var p=m.feature&&m.feature.properties; var n=p&&(p.nome_ferma||p.nome||''); if(n) tuttiIPunti.push({nome:n,categoria:cat,layer:m}); }); });
+            [['✝️ Cristiane Cattoliche',layerCattolici],['☦️ Cristiane Ortodosse',layerOrtodossi],['🛐 Evangeliche Protestanti',layerProtestanti],['✡️ Ebraiche',layerEbraiche],['☪️ Musulmane',layerMusulmane],['☸️ Buddhiste',layerBuddhiste],['🟪 Altre Esperienze',layerAltre]].forEach(([cat,l])=>{ l.eachLayer(m=>{ var p=m.feature&&m.feature.properties; var n=p&&(p.Nome||p.nome||''); if(n) tuttiIPunti.push({nome:n,categoria:cat,layer:m}); }); });
         }
 
         var ricTimer;
@@ -991,11 +1347,7 @@
                 d.addEventListener('click',()=>{ map.setView(p.layer.getLatLng(),16); p.layer.openPopup(); ris.style.display='none'; document.getElementById('ricerca-input').value=p.nome; });
                 ris.appendChild(d);
             });
-            ricTimer=setTimeout(()=>{
-                fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q+' Firenze')+'&format=json&limit=3').then(r=>r.json()).then(data=>{
-                    data.forEach(item=>{ var d=document.createElement('div'); d.className='risultato-item'; d.innerHTML=item.display_name.split(',').slice(0,2).join(', ')+' <span class="risultato-categoria">(indirizzo)</span>'; d.addEventListener('click',()=>{ map.setView([parseFloat(item.lat),parseFloat(item.lon)],16); ris.style.display='none'; }); ris.appendChild(d); });
-                });
-            },400);
+            ricTimer=setTimeout(()=>{ fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q+' Firenze')+'&format=json&limit=3').then(r=>r.json()).then(data=>{ data.forEach(item=>{ var d=document.createElement('div'); d.className='risultato-item'; d.innerHTML=item.display_name.split(',').slice(0,2).join(', ')+' <span class="risultato-categoria">(indirizzo)</span>'; d.addEventListener('click',()=>{ map.setView([parseFloat(item.lat),parseFloat(item.lon)],16); ris.style.display='none'; }); ris.appendChild(d); }); }); },400);
         });
 
         document.addEventListener('click', e=>{ if(!document.getElementById('ricerca-container').contains(e.target)) document.getElementById('ricerca-risultati').style.display='none'; });
