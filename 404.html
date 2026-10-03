@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagina non trovata — PRISMA</title>
+    <meta name="robots" content="noindex">
+    <!-- Pagina autonoma: funziona anche da indirizzi sbagliati in sottocartelle -->
+    <script>
+        (function () { var t; try { t = localStorage.getItem('prisma-tema'); } catch (e) {}
+        if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.dataset.theme = t; })();
+    </script>
+    <style>
+        :root { --bg: #fafafa; --text: #1a1a1a; --muted: #6b6b6b; --line: rgba(0,0,0,0.08); color-scheme: light; }
+        :root[data-theme="dark"] { --bg: #161616; --text: #ececec; --muted: #9c9c9c; --line: rgba(255,255,255,0.09); color-scheme: dark; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: var(--bg); color: var(--text); text-align: center; padding: 24px;
+            font-family: Inter, Helvetica, Arial, sans-serif;
+            background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+        .codice { font-size: clamp(72px, 18vw, 140px); font-weight: 200; letter-spacing: 12px; line-height: 1; margin-right: -12px; }
+        h1 { font-size: 18px; font-weight: 400; margin-top: 24px; }
+        p { font-size: 15px; font-weight: 300; color: var(--muted); margin-top: 10px; line-height: 1.6; }
+        a {
+            display: inline-block; margin-top: 32px; padding: 10px 20px;
+            border: 1px solid var(--text); border-radius: 6px;
+            color: var(--text); text-decoration: none; font-size: 13px; letter-spacing: 1px;
+        }
+        a:hover { background: var(--text); color: var(--bg); }
+        a:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="codice" aria-hidden="true">404</div>
+        <h1>Questa pagina non esiste</h1>
+        <p>L'indirizzo potrebbe essere sbagliato o la pagina è stata spostata.</p>
+        <a id="home" href="/">Torna alla mappa</a>
+    </main>
+    <script>
+        // Su GitHub Pages il sito vive in una sottocartella (/Firenze-delle-Religioni/)
+        if (location.hostname.endsWith('github.io')) {
+            var parti = location.pathname.split('/').filter(Boolean);
+            if (parti.length) document.getElementById('home').href = '/' + parti[0] + '/';
+        }
+    </script>
+</body>
+</html>
